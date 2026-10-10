@@ -1,0 +1,52 @@
+Third-party notices for Luma UI Prototype
+
+This file covers the fonts and images bundled with the build, plus the
+JavaScript dependencies. Notices for the JavaScript dependencies are
+enumerated below and expanded in the publication step.
+
+------------------------------------------------------------
+FONTS
+------------------------------------------------------------
+
+- Plus Jakarta Sans (variable)
+  Source: tokotype/PlusJakartaSans.
+  Licence: SIL Open Font License 1.1.
+  Use: all interface copy.
+  Full text: assets/fonts/PlusJakartaSans-OFL.txt
+
+- Roboto (Regular 400, Medium 500, Bold 700)
+  Source: the upstream Roboto release, with its licence text bundled.
+  Licence: SIL Open Font License 1.1.
+  Full text: assets/fonts/Roboto-OFL.txt
+
+------------------------------------------------------------
+IMAGES
+------------------------------------------------------------
+
+Event covers, host marks, template cards and the welcome collage are
+original illustrations made for this prototype. They are not screenshots,
+recolourings or derivatives of any Luma, host or third-party image, and
+they are distributed under the prototype's noncommercial study licence.
+
+No Luma brand graphics, logos or avatar illustrations are used.
+
+------------------------------------------------------------
+JAVASCRIPT DEPENDENCIES (summary)
+------------------------------------------------------------
+
+- expo 57.0.21, expo-font 57.0.3, expo-status-bar 57.0.1, expo-system-ui 57.0.3
+  Licence: MIT (Expo / 650 Industries).
+- react 19.2.3, react-dom 19.2.3
+  Licence: MIT (Meta Platforms).
+- react-native 0.86.3
+  Licence: MIT (Meta Platforms).
+- react-native-web 0.21.2
+  Licence: MIT (Nicolas Gallagher).
+- react-native-safe-area-context 5.7.0
+  Licence: MIT.
+- react-native-svg 15.15.4
+  Licence: MIT.
+
+The complete and authoritative dependency licence texts are resolved from
+each package's own licence file in node_modules and appended during the
+publication step.

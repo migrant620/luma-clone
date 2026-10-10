@@ -1,0 +1,14 @@
+{
+  "expo": {
+    "name": "Luma UI Prototype",
+    "slug": "luma-ui",
+    "version": "0.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "web": {
+      "bundler": "metro",
+      "output": "single"
+    },
+    "assets": ["./assets/fonts"]
+  }
+}
