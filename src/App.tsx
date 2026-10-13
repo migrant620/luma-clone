@@ -1055,7 +1055,7 @@ const styles = StyleSheet.create({
   pickedTitle: { fontSize: 19, fontWeight: '700', color: colors.ink, paddingHorizontal: 16, marginTop: 26.6 },
   popularTitle: { fontSize: 19, fontWeight: '600', color: colors.inkMuted, paddingHorizontal: 16, marginTop: 2 },
 
-  emptyCard: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, marginTop: 17.9, gap: 16 },
+  emptyCard: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, marginTop: 42, gap: 16 },
   emptyIcon: { width: 64, height: 64, borderRadius: 15, backgroundColor: colors.emptyTile, alignItems: 'center', justifyContent: 'center' },
   emptyTitle: { fontSize: 16, fontWeight: '500', color: colors.inkMuted },
   emptyDesc: { fontSize: 14, color: colors.inkMuted, marginTop: 6.2, lineHeight: 18 },
@@ -1104,7 +1104,7 @@ const styles = StyleSheet.create({
   browseTitle: { fontSize: 19, fontWeight: '700', color: colors.ink, paddingHorizontal: 16, marginTop: 22 },
   catRow: { marginTop: 13 },
   catRow2: { marginTop: 0 },
-  catChip: { flexDirection: 'row', alignItems: 'center', paddingLeft: 12, paddingRight: 13.5, height: 48, borderWidth: 1, borderColor: '#F0F0F1', borderRadius: 15, gap: 8, backgroundColor: colors.white },
+  catChip: { flexDirection: 'row', alignItems: 'center', paddingLeft: 12, paddingRight: 9, height: 48, borderWidth: 1, borderColor: '#F0F0F1', borderRadius: 15, gap: 8, backgroundColor: colors.white },
   catLabel: { fontSize: 16, fontWeight: '500', color: colors.ink },
   citiesRow: { flexDirection: 'row', alignItems: 'flex-start', paddingHorizontal: 16, marginTop: 17.65 },
   discCities: { fontSize: 19, fontWeight: '700', color: colors.ink, lineHeight: 25, width: 53.1 },
@@ -1203,7 +1203,7 @@ const styles = StyleSheet.create({
   createAvatarTarget: { position: 'absolute' as const, left: 0, top: 10, width: 28, height: 28 },
   restorePill: { alignSelf: 'center', flexDirection: 'row', alignItems: 'flex-start', backgroundColor: '#EDEEEF', borderRadius: 20.75, width: 168.8, height: 41.5, paddingLeft: 12 },
   restoreClock: { marginTop: 11.75 },
-  restoreText: { fontSize: 14, color: '#969798', width: 92.4, marginLeft: 4, marginTop: 8, lineHeight: 18.9, flexShrink: 0 },
+  restoreText: { fontSize: 14, color: '#969798', marginLeft: 4, marginTop: 8, lineHeight: 18.9, flexShrink: 0 },
   restoreClose: { width: 48, height: 41.5, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
   coverUpload: { width: 240.5, height: 240.5, alignSelf: 'center', backgroundColor: '#EDEEEF', borderRadius: 20, marginTop: 5.5 },
   coverUploadBtn: {
