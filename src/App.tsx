@@ -1055,7 +1055,7 @@ const styles = StyleSheet.create({
   pickedTitle: { fontSize: 19, fontWeight: '700', color: colors.ink, paddingHorizontal: 16, marginTop: 26.6 },
   popularTitle: { fontSize: 19, fontWeight: '600', color: colors.inkMuted, paddingHorizontal: 16, marginTop: 2 },
 
-  emptyCard: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, marginTop: 42, gap: 16 },
+  emptyCard: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, marginTop: 18, gap: 16 },
   emptyIcon: { width: 64, height: 64, borderRadius: 15, backgroundColor: colors.emptyTile, alignItems: 'center', justifyContent: 'center' },
   emptyTitle: { fontSize: 16, fontWeight: '500', color: colors.inkMuted },
   emptyDesc: { fontSize: 14, color: colors.inkMuted, marginTop: 6.2, lineHeight: 18 },
