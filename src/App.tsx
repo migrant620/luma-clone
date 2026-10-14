@@ -936,6 +936,7 @@ function TabBar({ active, onChange }: { active: string; onChange: (t: string) =>
   ];
   return (
     <View style={styles.tabBar}>
+      <View style={styles.tabBarFill} pointerEvents="none" />
       {tabs.map((t) => {
         const I = t.icon;
         const isActive = active === t.id;
@@ -1249,8 +1250,11 @@ const styles = StyleSheet.create({
 
   tabBar: {
     position: 'absolute', bottom: 0, left: 0, right: 0,
-    flexDirection: 'row', backgroundColor: colors.tabBar, gap: 8,
+    flexDirection: 'row', backgroundColor: 'transparent', gap: 8,
     paddingTop: 0, paddingBottom: 0, height: 88, justifyContent: 'flex-start',
+  },
+  tabBarFill: {
+    position: 'absolute', top: 25, left: 0, right: 0, bottom: 0, backgroundColor: colors.tabBar,
   },
   tabItem: { flex: 1, alignItems: 'center', justifyContent: 'flex-start', paddingTop: 0 },
   tabIconWrap: { width: 56, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 16, marginTop: 20 },
