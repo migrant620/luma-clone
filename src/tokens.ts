@@ -34,7 +34,7 @@ export const colors = {
   btnGray: '#F0F0F2',
   btnGrayText: '#1A1A1A',
 
-  divider: '#ECECEE',
+  divider: '#F0F0F1',
   border: '#E5E5E8',
 
   fab: '#ECEDEE',

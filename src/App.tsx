@@ -526,6 +526,8 @@ function PopularCard({ ev, cover, preview, onPress, isLast, isFirst }: { ev?: an
   );
 }
 
+const DISCOVER_RULES = [590.6, 629.9, 639.0, 678.3];
+
 function DiscoverScreen({ onOpenDetail, onScroll }: { onOpenDetail: (id: string) => void; onScroll?: (y: number) => void }) {
   const catIcons: Record<string, any> = {
     family: <CatFamily />, tech: <CatTech />, food: <CatFood />,
@@ -601,6 +603,9 @@ function DiscoverScreen({ onOpenDetail, onScroll }: { onOpenDetail: (id: string)
           </View>
         </View>
       </ScrollView>
+      {DISCOVER_RULES.map((top) => (
+        <View key={top} style={[styles.hairline, { top, left: 23.7 }]} pointerEvents="none" />
+      ))}
     </View>
   );
 }
@@ -795,6 +800,7 @@ function CoverGallery({ onBack }: { onBack: () => void }) {
           ))}
         </View>
       </ScrollView>
+      <View style={[styles.hairline, { top: 698.7 }]} pointerEvents="none" />
       <View style={styles.galleryFooter}>
         <TouchableOpacity style={styles.galleryChooseBtn} accessibilityLabel="Choose From Library">
           <Text style={styles.galleryChooseText}>Choose From Library</Text>
@@ -888,6 +894,7 @@ function CreateScreen({ onBack }: { onBack: () => void }) {
           </TouchableOpacity>
         </View>
       </ScrollView>
+      <View style={[styles.hairline, { top: 496.3 }]} pointerEvents="none" />
       <HomeIndicator />
     </View>
   );
@@ -998,6 +1005,7 @@ export default function App() {
 
 const styles = StyleSheet.create({
   appRoot: { flex: 1, backgroundColor: colors.white, maxWidth: 480, alignSelf: 'center', width: '100%', height: '100%', overflow: 'hidden' },
+  hairline: { position: 'absolute', left: 0, right: 0, height: 1, backgroundColor: colors.divider },
   screenRoot: { flex: 1, height: '100%', backgroundColor: colors.white },
   scroll: { flex: 1 },
 
