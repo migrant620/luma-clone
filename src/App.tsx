@@ -1214,12 +1214,12 @@ const styles = StyleSheet.create({
   restoreClock: { marginTop: 11.75 },
   restoreText: { fontSize: 14, color: '#969798', marginLeft: 4, marginTop: 8, lineHeight: 18.9, flexShrink: 0 },
   restoreClose: { width: 48, height: 41.5, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
-  coverUpload: { width: 240.5, height: 240.5, alignSelf: 'center', backgroundColor: '#EDEEEF', borderRadius: 20, marginTop: 5.5 },
+  coverUpload: { width: 240.5, height: 240.5, alignSelf: 'center', backgroundColor: '#EDEEEF', borderRadius: 12, marginTop: 5.5 },
   coverUploadBtn: {
     position: 'absolute', right: 4, bottom: 4, width: 48, height: 48, borderRadius: 24,
     backgroundColor: 'transparent', alignItems: 'center', justifyContent: 'center',
   },
-  inputField: { width: 361, height: 58.6, alignSelf: 'center', backgroundColor: '#fff', borderRadius: 20, justifyContent: 'center', paddingLeft: 16, marginTop: 30.2 },
+  inputField: { width: 361, height: 58.6, alignSelf: 'center', backgroundColor: '#fff', borderRadius: 26, justifyContent: 'center', paddingLeft: 16, marginTop: 30.2 },
   eventNameHint: { fontSize: 21, fontWeight: '500', color: '#C4C4C5', width: 119.7 },
   timeCard: { width: 361, alignSelf: 'center', backgroundColor: '#fff', borderRadius: 24, marginTop: 12.7, height: 105.6, justifyContent: 'center' },
   timeLineRow: { flexDirection: 'row', alignItems: 'center', height: 52.8, paddingLeft: 16, paddingRight: 16 },
@@ -1236,7 +1236,7 @@ const styles = StyleSheet.create({
   pillBox: { width: '100%', height: 36, borderRadius: 10, backgroundColor: '#F4F4F6', alignItems: 'center', justifyContent: 'center' },
   pillText: { fontSize: 16, fontWeight: '500', color: '#151516', width: '100%', textAlign: 'center' },
   rowCard: { width: 361, height: 48, alignSelf: 'center', backgroundColor: '#fff', borderRadius: 20, flexDirection: 'row', alignItems: 'center', paddingLeft: 16, marginTop: 9.1 },
-  rowCardTall: { width: 361, height: 52, alignSelf: 'center', backgroundColor: '#fff', borderRadius: 20, flexDirection: 'row', alignItems: 'center', paddingLeft: 16, marginTop: 10.5 },
+  rowCardTall: { width: 361, height: 52, alignSelf: 'center', backgroundColor: '#fff', borderRadius: 26, flexDirection: 'row', alignItems: 'center', paddingLeft: 16, marginTop: 10.5 },
   rowLabelLocation: { fontSize: 15.5, color: '#A1A1A2', width: 128.8, marginLeft: 6, fontWeight: '500' },
   rowLabelDesc: { fontSize: 15.5, color: '#A1A1A2', width: 122.3, marginLeft: 6, fontWeight: '500' },
   rowLabelApproval: { fontSize: 15.5, color: '#A1A1A2', width: 130.3, marginLeft: 8, fontWeight: '500' },
@@ -1278,7 +1278,7 @@ const styles = StyleSheet.create({
   createFabSmall: {
     position: 'absolute', right: 16, bottom: 79, width: 56, height: 56, borderRadius: 20,
     alignItems: 'center', justifyContent: 'center', backgroundColor: colors.fab,
-    shadowColor: '#000', shadowOpacity: 0.12, shadowRadius: 14, shadowOffset: { width: 0, height: 4 },
+    shadowColor: '#000', shadowOpacity: 0.22, shadowRadius: 10, shadowOffset: { width: 0, height: 4 },
     elevation: 5, zIndex: 30,
   },
 });
