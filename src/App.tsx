@@ -1029,8 +1029,8 @@ const styles = StyleSheet.create({
     width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center',
     shadowColor: '#F65991', shadowOpacity: 0.35, shadowRadius: 16, shadowOffset: { width: 0, height: 6 },
   },
-  promoHint: { position: 'absolute', left: 0, right: 0, bottom: 96, zIndex: 3, textAlign: 'center', fontSize: 13.2, lineHeight: 16.4, color: '#FFFFFF' },
-  loginHint: { position: 'absolute', left: 0, right: 0, top: 200.9, zIndex: 3, textAlign: 'center', fontSize: 13.2, lineHeight: 16.4, color: '#FFFFFF' },
+  promoHint: { position: 'absolute', left: 0, right: 0, bottom: 96, zIndex: 3, textAlign: 'center', fontSize: 13.2, lineHeight: 16.4, color: '#F7F7F7' },
+  loginHint: { position: 'absolute', left: 0, right: 0, top: 200.9, zIndex: 3, textAlign: 'center', fontSize: 13.2, lineHeight: 16.4, color: '#F7F7F7' },
 
   loginCovers: { position: 'absolute', top: -49.5, left: 0, width: 393, height: 242 },
   loginTextBlock: { position: 'absolute', top: 298, left: 0, right: 0, alignItems: 'center', zIndex: 2 },
