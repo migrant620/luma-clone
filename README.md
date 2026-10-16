@@ -84,7 +84,7 @@ The static output is written to `dist/`. Serve that directory over HTTP or HTTPS
 
 ## Demo build
 
-The published demo at <https://luma-ui.edgeone.cool> is built from this repository. It was last rebuilt and redeployed on 2026-10-16 (EdgeOne deployment `dpldo2i4fl2l`, source revision `15bb6fe1`).
+The published demo at <https://luma-ui.edgeone.cool> is built from this repository. It was last rebuilt and redeployed on 2026-10-16 (EdgeOne deployment `dp8zj6gduzlz`, source revision `3e73efe4`).
 
 ## Scope and limitations
 
