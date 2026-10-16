@@ -1076,7 +1076,7 @@ const styles = StyleSheet.create({
   dateSticky: { position: 'sticky', top: 14.2, zIndex: 5, backgroundColor: colors.white } as any,
   dateBold: { fontSize: 16, fontWeight: '600', color: colors.ink, letterSpacing: -0.16 },
   dateSlash: { fontSize: 16, color: colors.inkMuted, marginRight: 6 },
-  dateDay: { fontSize: 16, color: colors.inkMuted, letterSpacing: -0.68 },
+  dateDay: { fontSize: 16, color: colors.inkMuted, letterSpacing: -0.68, paddingRight: 4.8 },
 
   feedRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, marginTop: 10, paddingBottom: 16 },
   feedCover: { width: 80, height: 80, borderRadius: 12, backgroundColor: '#E8E8EC', alignSelf: 'flex-start' },
