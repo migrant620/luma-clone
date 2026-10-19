@@ -214,3 +214,17 @@ export const detailEvents: Record<string, DetailEvent> = {
 };
 
 export const detailEvent = detailEvents.summit;
+
+export interface AccountProfile {
+  name: string;
+  joined: string;
+  hosted: number;
+  attended: number;
+}
+
+export const accountProfile: AccountProfile = {
+  name: 'Sam Rivera',
+  joined: 'Joined September 2026',
+  hosted: 0,
+  attended: 0,
+};

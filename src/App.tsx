@@ -14,7 +14,10 @@ import {
   CatFamily, CatTech, CatFood, CatBooks, CatGames, CatAI, CatRunning,
   GearMark, SparkleIcon,
 } from './icons';
-import { feedEvents, popularEvents, categories, detailEvent, detailEvents } from './data';
+import { feedEvents, popularEvents, categories, detailEvent, detailEvents, accountProfile } from './data';
+import { EmailSignInScreen, LinkPhoneScreen, PasskeyPromptScreen, NotifyOptInScreen } from './screens/Onboarding';
+import { ProfileScreen } from './screens/Profile';
+import { ChatIllustration } from './components/ChatIllustration';
 import { extractCoverBackground } from './palette';
 import { useAppFonts } from './webfont';
 
@@ -175,8 +178,8 @@ function DownArrow({ size = 28, color = '#fff' }: { size?: number; color?: strin
   );
 }
 
-function PromoScreen({ onNext }: { onNext: () => void }) {
-  const [panelOpen, setPanelOpen] = React.useState(false);
+function PromoScreen({ onNext, onEmail, initialPanelOpen = false }: { onNext: () => void; onEmail: () => void; initialPanelOpen?: boolean }) {
+  const [panelOpen, setPanelOpen] = React.useState(initialPanelOpen);
   const startGradient =
     Platform.OS === 'web'
       ? ({
@@ -245,7 +248,7 @@ function PromoScreen({ onNext }: { onNext: () => void }) {
             <TouchableOpacity style={styles.phoneBtn} accessibilityLabel="Continue with Phone" onPress={onNext}>
               <Text style={styles.phoneBtnText}>Continue with Phone</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.emailBtn}>
+            <TouchableOpacity style={styles.emailBtn} onPress={onEmail}>
               <Text style={styles.emailBtnText}>Continue with Email</Text>
             </TouchableOpacity>
             <View style={styles.oauthRow}>
@@ -295,16 +298,12 @@ function PopularHostMark({ kind }: { kind: string }) {
 }
 
 
-function HomeScreen({ onOpenDetail, onScroll }: { onOpenDetail: (id: string) => void; onScroll?: (y: number) => void }) {
+function HomeScreen({ onOpenDetail, onScroll, onProfile }: { onOpenDetail: (id: string) => void; onScroll?: (y: number) => void; onProfile: () => void }) {
   return (
     <View style={styles.screenRoot}>
       <StatusBar />
       <View style={styles.homeHeader}>
-        <View accessibilityRole="button" style={styles.avatarBtn}>
-          <View accessibilityRole="button" accessibilityLabel="Profile" style={[styles.avatar as any, { overflow: 'hidden' }]}>
-            <AccountAvatar size={40} />
-          </View>
-        </View>
+        <HeaderAvatar onPress={onProfile} />
         <View accessibilityRole="button" accessibilityLabel="luma" style={{ position: 'relative', width: 54, height: 28, marginLeft: -2.25, marginTop: -2.6 }}>
           <Text style={[styles.headerTitle, { position: 'absolute', left: 0, top: 0, transform: [{ scaleX: 0.92 }] }]}>luma</Text>
           <View style={{ position: 'absolute', left: 50, top: 5.8 }}>
@@ -412,13 +411,13 @@ function AccountAvatar({ size, style }: { size: number; style?: any }) {
     />
   );
 }
-function HeaderAvatar() {
+function HeaderAvatar({ onPress }: { onPress: () => void }) {
   return (
-    <View accessibilityRole="button" style={styles.avatarBtn}>
+    <TouchableOpacity accessibilityRole="button" style={styles.avatarBtn} onPress={onPress} activeOpacity={0.7}>
       <View accessibilityRole="button" accessibilityLabel="Profile" style={[styles.avatar as any, { overflow: 'hidden' }]}>
         <AccountAvatar size={40} />
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 
@@ -528,7 +527,7 @@ function PopularCard({ ev, cover, preview, onPress, isLast, isFirst }: { ev?: an
 
 const DISCOVER_RULES = [590.6, 629.9, 639.0, 678.3];
 
-function DiscoverScreen({ onOpenDetail, onScroll }: { onOpenDetail: (id: string) => void; onScroll?: (y: number) => void }) {
+function DiscoverScreen({ onOpenDetail, onScroll, onProfile }: { onOpenDetail: (id: string) => void; onScroll?: (y: number) => void; onProfile: () => void }) {
   const catIcons: Record<string, any> = {
     family: <CatFamily />, tech: <CatTech />, food: <CatFood />,
     books: <CatBooks />, games: <CatGames />, ai: <CatAI />, running: <CatRunning />,
@@ -539,7 +538,7 @@ function DiscoverScreen({ onOpenDetail, onScroll }: { onOpenDetail: (id: string)
     <View style={styles.screenRoot}>
       <StatusBar />
       <View style={styles.homeHeader}>
-        <HeaderAvatar />
+        <HeaderAvatar onPress={onProfile} />
         <Text style={styles.screenTitle}>Discover</Text>
         <View style={{ flex: 1 }} />
         <View accessibilityRole="button" accessibilityLabel="Map" style={[styles.headerIconBtn, { marginRight: -4 }]}>
@@ -754,13 +753,64 @@ const galleryCats = [
 ];
 
 const galleryTiles = [
-  { label: 'Halloween', cover: require('../assets/covers/card-halloween.jpg') },
-  { label: 'Thanksgiving', cover: require('../assets/covers/card-thanks.jpg') },
-  { label: 'Invitation', cover: require('../assets/covers/card-invite.jpg') },
-  { label: 'Birthday', cover: require('../assets/covers/card-birthday.jpg') },
+  { label: 'Halloween', cover: require('../assets/covers/card-halloween.jpg'), cats: ['suggested', 'halloween'] },
+  { label: 'Thanksgiving', cover: require('../assets/covers/card-thanks.jpg'), cats: ['suggested', 'thanksgiving'] },
+  { label: 'Invitation', cover: require('../assets/covers/card-invite.jpg'), cats: ['suggested', 'school'] },
+  { label: 'Birthday', cover: require('../assets/covers/card-birthday.jpg'), cats: ['suggested', 'school'] },
 ];
 
-function CoverGallery({ onBack }: { onBack: () => void }) {
+const GALLERY_LOAD_MS = 650;
+
+function GallerySkeleton() {
+  return (
+    <View {...({ 'aria-busy': true } as object)} accessibilityLabel="Loading covers">
+      <View style={[styles.galleryHero, styles.skelHero]}>
+        <View style={[styles.skelBar, { left: 16.4, top: 18.8, width: 102.2, height: 15 }]} />
+        <View style={[styles.skelBar, { left: 16.4, top: 41.2, width: 15.3, height: 11 }]} />
+      </View>
+      <View style={styles.galleryGrid}>
+        {[0, 1, 2, 3].map((k) => (
+          <View key={k} style={[styles.galleryTile, styles.skelTile]}>
+            <View style={styles.skelTileImg} />
+            <View style={styles.galleryTileLabelWrap}>
+              <View style={[styles.skelBar, { position: 'relative', width: 70.9, height: 13 }]} />
+            </View>
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+}
+
+function pickImageFromLibrary(onPicked: (uri: string) => void) {
+  if (Platform.OS !== 'web' || typeof document === 'undefined') return;
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.onchange = () => {
+    const file = input.files && input.files[0];
+    if (file) onPicked(URL.createObjectURL(file));
+  };
+  input.click();
+}
+
+function CoverGallery({ onBack, onPick }: { onBack: () => void; onPick: (cover: any) => void }) {
+  const [active, setActive] = React.useState(0);
+  const [loading, setLoading] = React.useState(false);
+  React.useEffect(() => {
+    if (!loading) return undefined;
+    const t = setTimeout(() => setLoading(false), GALLERY_LOAD_MS);
+    return () => clearTimeout(t);
+  }, [loading, active]);
+  const cat = galleryCats[active];
+  const tiles = galleryTiles.filter((t) => t.cats.includes(cat.id));
+  const selectCat = (i: number) => {
+    if (i === active) return;
+    setActive(i);
+    setLoading(true);
+  };
+  const heroTitle = active === 0 ? 'School' : cat.label;
+  const heroCount = active === 0 ? '21 Images' : `${tiles.length} ${tiles.length === 1 ? 'Image' : 'Images'}`;
   return (
     <View style={styles.galleryRoot} accessibilityRole={'dialog' as any} accessibilityViewIsModal={true}>
       <StatusBar />
@@ -774,24 +824,33 @@ function CoverGallery({ onBack }: { onBack: () => void }) {
       </View>
       <View style={styles.galleryCats}>
         {galleryCats.map((c, i) => (
-          <View key={c.id} style={styles.galleryCat}>
-            {c.icon}
-            <Text style={[styles.galleryCatLabel, { letterSpacing: (c as any).track }, i === 0 && styles.galleryCatActive]}>{c.label}</Text>
-            {i === 0 && <View style={styles.galleryCatUnderline} />}
-          </View>
+          <TouchableOpacity
+            key={c.id}
+            style={styles.galleryCat}
+            onPress={() => selectCat(i)}
+            activeOpacity={0.7}
+            accessibilityRole={'tab' as any}
+            accessibilityState={{ selected: i === active }}
+          >
+            {React.cloneElement(c.icon, { color: i === active ? '#151516' : '#8E8E93' })}
+            <Text style={[styles.galleryCatLabel, { letterSpacing: (c as any).track }, i === active && styles.galleryCatActive]}>{c.label}</Text>
+            {i === active && <View style={styles.galleryCatUnderline} />}
+          </TouchableOpacity>
         ))}
       </View>
       <View style={styles.galleryScrollbar} {...({ tabIndex: 0 } as any)} />
       <ScrollView style={styles.galleryScroll} contentContainerStyle={{ paddingHorizontal: 16 }} showsVerticalScrollIndicator={false}>
+        {loading ? <GallerySkeleton /> : (
+        <>
         <View style={styles.galleryHero}>
-          <Text style={styles.galleryHeroTitle}>School</Text>
-          <Text style={styles.galleryHeroCount}>21 Images</Text>
+          <Text style={styles.galleryHeroTitle}>{heroTitle}</Text>
+          <Text style={styles.galleryHeroCount}>{heroCount}</Text>
           <Image source={require('../assets/covers/card-halloween.jpg')} style={styles.galleryHeroCardA as any} />
           <Image source={require('../assets/covers/card-birthday.jpg')} style={styles.galleryHeroCardB as any} />
         </View>
         <View style={styles.galleryGrid}>
-          {galleryTiles.map((t) => (
-            <TouchableOpacity key={t.label} style={styles.galleryTile} activeOpacity={0.85} accessibilityRole="button">
+          {tiles.map((t) => (
+            <TouchableOpacity key={t.label} style={styles.galleryTile} activeOpacity={0.85} accessibilityRole="button" onPress={() => onPick(t.cover)}>
               <Image source={t.cover} style={styles.galleryTileImg as any} resizeMode="cover" />
               <View style={styles.galleryTileLabelWrap} {...({ 'aria-hidden': true } as any)}>
                 <Text style={styles.galleryTileLabel}>{t.label}</Text>
@@ -799,10 +858,12 @@ function CoverGallery({ onBack }: { onBack: () => void }) {
             </TouchableOpacity>
           ))}
         </View>
+        </>
+        )}
       </ScrollView>
       <View style={[styles.hairline, { top: 698.7 }]} pointerEvents="none" />
       <View style={styles.galleryFooter}>
-        <TouchableOpacity style={styles.galleryChooseBtn} accessibilityLabel="Choose From Library">
+        <TouchableOpacity style={styles.galleryChooseBtn} accessibilityLabel="Choose From Library" onPress={() => pickImageFromLibrary((uri) => onPick({ uri }))}>
           <Text style={styles.galleryChooseText}>Choose From Library</Text>
         </TouchableOpacity>
       </View>
@@ -814,7 +875,8 @@ function CoverGallery({ onBack }: { onBack: () => void }) {
 function CreateScreen({ onBack }: { onBack: () => void }) {
   const [approval, setApproval] = React.useState(false);
   const [gallery, setGallery] = React.useState(false);
-  if (gallery) return <CoverGallery onBack={() => setGallery(false)} />;
+  const [cover, setCover] = React.useState<any>(null);
+  if (gallery) return <CoverGallery onBack={() => setGallery(false)} onPick={(c) => { setCover(c); setGallery(false); }} />;
   return (
     <View style={styles.createRoot}>
       <StatusBar />
@@ -826,7 +888,7 @@ function CreateScreen({ onBack }: { onBack: () => void }) {
         <View style={{ flex: 1 }} />
         <View style={styles.createAvatarGroup} accessibilityRole="button">
           <AccountAvatar size={28} style={{ pointerEvents: 'none' }} />
-          <View style={styles.createAvatarTarget} accessibilityRole="button" accessibilityLabel="Sam Rivera" />
+          <View style={styles.createAvatarTarget} accessibilityRole="button" accessibilityLabel={accountProfile.name} />
           <ChevronDown size={18} color="#A8A8AC" />
         </View>
       </View>
@@ -845,6 +907,7 @@ function CreateScreen({ onBack }: { onBack: () => void }) {
           onPress={() => setGallery(true)}
           activeOpacity={0.9}
         >
+          {cover && <Image source={cover} style={styles.coverChosen as any} resizeMode="cover" />}
           <TouchableOpacity style={styles.coverUploadBtn} accessibilityRole="button" onPress={() => setGallery(true)} activeOpacity={0.85}>
             <ImageAddIcon size={22} color="#222324" />
           </TouchableOpacity>
@@ -900,12 +963,12 @@ function CreateScreen({ onBack }: { onBack: () => void }) {
   );
 }
 
-function EmptyScreen({ title, desc, notif = false, chat = false }: { title: string; desc: string; notif?: boolean; chat?: boolean }) {
+function EmptyScreen({ title, desc, notif = false, chat = false, onProfile }: { title: string; desc: string; notif?: boolean; chat?: boolean; onProfile: () => void }) {
   return (
     <View style={styles.screenRoot}>
       <StatusBar />
       <View style={styles.homeHeader}>
-        <HeaderAvatar />
+        <HeaderAvatar onPress={onProfile} />
         <Text style={styles.screenTitle}>{title}</Text>
         <View style={{ flex: 1 }} />
         {chat && (
@@ -918,9 +981,7 @@ function EmptyScreen({ title, desc, notif = false, chat = false }: { title: stri
         {notif ? (
           <Image source={require('../assets/covers/notif-invites.png')} style={styles.notifIllustration as any} resizeMode="contain" />
         ) : (
-          <View style={styles.chatPlaceholder}>
-            <ChatIcon size={64} color="#D0D0D5" />
-          </View>
+          <ChatIllustration />
         )}
         <Text style={styles.bigEmptyTitle}>{notif ? 'No Notifications' : 'It’s Quiet Here'}</Text>
         <Text style={styles.bigEmptyDesc}>{desc}</Text>
@@ -960,7 +1021,7 @@ function TabBar({ active, onChange }: { active: string; onChange: (t: string) =>
   );
 }
 
-type Screen = 'promo' | 'main' | 'detail' | 'create';
+type Screen = 'promo' | 'login' | 'email' | 'linkPhone' | 'passkey' | 'notifyOptIn' | 'main' | 'detail' | 'create' | 'profile';
 
 export default function App() {
   const [loaded] = useAppFonts();
@@ -980,16 +1041,24 @@ export default function App() {
     lastY.current = y;
   };
 
-  if (screen === 'promo') return <PromoScreen onNext={() => setScreen('main')} />;
+  if (screen === 'promo' || screen === 'login') {
+    return <PromoScreen key={screen} initialPanelOpen={screen === 'login'} onNext={() => setScreen('main')} onEmail={() => setScreen('email')} />;
+  }
+  if (screen === 'email') return <EmailSignInScreen onBack={() => setScreen('login')} onNext={() => setScreen('linkPhone')} />;
+  if (screen === 'linkPhone') return <LinkPhoneScreen onNext={() => setScreen('passkey')} />;
+  if (screen === 'passkey') return <PasskeyPromptScreen onNext={() => setScreen('notifyOptIn')} />;
+  if (screen === 'notifyOptIn') return <NotifyOptInScreen onNext={() => setScreen('main')} />;
   if (screen === 'detail') return <DetailScreen eventId={detailId} onBack={() => setScreen('main')} />;
   if (screen === 'create') return <CreateScreen onBack={() => setScreen('main')} />;
+  if (screen === 'profile') return <ProfileScreen onBack={() => setScreen('main')} avatar={<AccountAvatar size={80} />} />;
+  const openProfile = () => setScreen('profile');
 
   return (
     <View style={styles.appRoot}>
-      {tab === 'home' && <HomeScreen onOpenDetail={openDetail} onScroll={onScroll} />}
-      {tab === 'discover' && <DiscoverScreen onOpenDetail={openDetail} onScroll={onScroll} />}
-      {tab === 'notif' && <EmptyScreen title="Notifications" desc="Notifications about your events and friends will show up here." notif />}
-      {tab === 'chat' && <EmptyScreen title="Chat" desc="Start a chat with your friends or others in your event." chat />}
+      {tab === 'home' && <HomeScreen onOpenDetail={openDetail} onScroll={onScroll} onProfile={openProfile} />}
+      {tab === 'discover' && <DiscoverScreen onOpenDetail={openDetail} onScroll={onScroll} onProfile={openProfile} />}
+      {tab === 'notif' && <EmptyScreen title="Notifications" desc="Notifications about your events and friends will show up here." notif onProfile={openProfile} />}
+      {tab === 'chat' && <EmptyScreen title="Chat" desc="Start a chat with your friends or others in your event." chat onProfile={openProfile} />}
       <TabBar active={tab} onChange={(t) => { setTab(t); setFabCollapsed(false); lastY.current = 0; }} />
       {tab === 'home' && (
         <TouchableOpacity
@@ -1202,6 +1271,11 @@ const styles = StyleSheet.create({
   galleryFooter: { position: 'absolute' as const, left: 16, right: 16, bottom: 15, height: 50.2, justifyContent: 'center' },
   galleryChooseBtn: { flex: 1, paddingHorizontal: 12, backgroundColor: '#2E2E30', borderRadius: 25, alignItems: 'center', justifyContent: 'center' },
   galleryChooseText: { width: '100%', textAlign: 'center', color: '#FFFFFF', fontSize: 16, fontWeight: '500' },
+  skelHero: { backgroundColor: '#F6F6F6' },
+  skelBar: { position: 'absolute' as const, backgroundColor: '#EDEDED', borderRadius: 3 },
+  skelTile: { backgroundColor: '#F6F6F6', height: 172.5 },
+  skelTileImg: { height: 124.9, backgroundColor: '#D6D6D6' },
+  coverChosen: { position: 'absolute' as const, left: 0, top: 0, width: '100%', height: '100%', borderRadius: 12 },
   coverChangeText: { fontSize: 13, color: colors.inkMuted, marginTop: 6, alignSelf: 'center' },
 
   createRoot: { flex: 1, height: '100%', backgroundColor: '#F6F7F8' },
@@ -1209,7 +1283,7 @@ const styles = StyleSheet.create({
   createHeader: { flexDirection: 'row', alignItems: 'center', paddingLeft: 8, paddingRight: 16, paddingTop: 4, paddingBottom: 4, height: 56, gap: 8 },
   createTitle: { fontSize: 19, fontWeight: '500', color: colors.ink, width: 116.1 },
   createAvatarGroup: { width: 54.2, height: 48, flexDirection: 'row', alignItems: 'center' },
-  createAvatarTarget: { position: 'absolute' as const, left: 0, top: 10, width: 28, height: 28 },
+  createAvatarTarget: { position: 'absolute' as const, left: 0, top: 9.8, width: 28, height: 28 },
   restorePill: { alignSelf: 'center', flexDirection: 'row', alignItems: 'flex-start', backgroundColor: '#EDEEEF', borderRadius: 20.75, width: 168.8, height: 41.5, paddingLeft: 12 },
   restoreClock: { marginTop: 11.75 },
   restoreText: { fontSize: 14, color: '#969798', marginLeft: 4, marginTop: 8, lineHeight: 18.9, flexShrink: 0 },
@@ -1250,10 +1324,9 @@ const styles = StyleSheet.create({
 
   emptyStateWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 30, paddingBottom: 34 },
   notifIllustration: { width: 250, height: 196 },
-  chatPlaceholder: { marginBottom: 18 },
   bigEmptyTitle: { fontSize: 19.3, fontWeight: '600', color: '#737373', lineHeight: 25.1, marginTop: 18 },
   bigEmptyDesc: { fontSize: 15, color: '#737373', textAlign: 'center', marginTop: 6.9, lineHeight: 19.5 },
-  startChatBtn: { marginTop: 21, height: 44, paddingHorizontal: 20, borderRadius: 22, backgroundColor: colors.btnBlack, alignItems: 'center', justifyContent: 'center' },
+  startChatBtn: { marginTop: 25.5, height: 43.7, width: 106.3, borderRadius: 21.85, backgroundColor: colors.btnBlack, alignItems: 'center', justifyContent: 'center' },
   startChatText: { color: '#FFFFFF', fontSize: 16, fontWeight: '600' },
 
   tabBar: {
