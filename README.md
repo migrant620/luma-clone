@@ -1,11 +1,11 @@
 <p align="center">
-  <a href="https://luma-ui.edgeone.cool"><img src="docs/demo.gif" width="280" alt="Walking through the Luma welcome wall, event feed, Discover list, event detail and the create flow"></a>
+  <a href="https://migrant620.github.io/luma/"><img src="docs/demo.gif" width="280" alt="Walking through the Luma welcome wall, event feed, Discover list, event detail and the create flow"></a>
 </p>
 
 <h1 align="center">Luma UI</h1>
 
 <p align="center">
-  <a href="https://luma-ui.edgeone.cool"><img src="https://img.shields.io/badge/%E2%96%B6%20Live%20demo-luma--ui.edgeone.cool-F65A90?style=for-the-badge" alt="Live demo"></a>
+  <a href="https://migrant620.github.io/luma/"><img src="https://img.shields.io/badge/%E2%96%B6%20Live%20demo-migrant620.github.io%2Fluma-F65A90?style=for-the-badge" alt="Live demo"></a>
 </p>
 
 <p align="center">
@@ -84,7 +84,7 @@ The static output is written to `dist/`. Serve that directory over HTTP or HTTPS
 
 ## Demo build
 
-The published demo at <https://luma-ui.edgeone.cool> is built from this repository. It was last rebuilt and redeployed on 2026-10-19 (EdgeOne deployment `dp7x9xh9l753`, source revision `cf963231`).
+The published demo at <https://migrant620.github.io/luma/> is built from this repository. It was last rebuilt and redeployed on 2026-10-20 (GitHub Pages commit `0dd8495e`, source revision `4060a8ce`).
 
 ## Scope and limitations
 
