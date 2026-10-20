@@ -2,14 +2,14 @@
   <a href="https://migrant620.github.io/luma/"><img src="docs/demo.gif" width="280" alt="Walking through the Luma welcome wall, event feed, Discover list, event detail and the create flow"></a>
 </p>
 
-<h1 align="center">Luma UI</h1>
+<h1 align="center">Luma Clone</h1>
 
 <p align="center">
   <a href="https://migrant620.github.io/luma/"><img src="https://img.shields.io/badge/%E2%96%B6%20Live%20demo-migrant620.github.io%2Fluma-F65A90?style=for-the-badge" alt="Live demo"></a>
 </p>
 
 <p align="center">
-  A high-fidelity, interactive recreation of the Luma Android app — real components, real navigation and local state, running in your browser.<br>
+  A Luma clone in React Native + Expo: a high-fidelity, interactive recreation of the Luma Android app — real components, real navigation and local state, running in your browser.<br>
   <a href="DESIGN.md">DESIGN.md</a> · <a href="#design-notes">Design notes</a> · <a href="#explore-the-prototype">Explore</a> · <a href="#run-locally">Run locally</a> · <a href="#scope-and-limitations">Scope</a> · <a href="https://github.com/migrant620/awesome-app-design-md">More apps →</a>
 </p>
 
@@ -84,7 +84,7 @@ The static output is written to `dist/`. Serve that directory over HTTP or HTTPS
 
 ## Demo build
 
-The published demo at <https://migrant620.github.io/luma/> is built from this repository. It was last rebuilt and redeployed on 2026-10-20 (GitHub Pages commit `0dd8495e`, source revision `4060a8ce`).
+The published demo at <https://migrant620.github.io/luma/> is built from this repository. It was last rebuilt and redeployed on 2026-10-20 (GitHub Pages commit `0dd8495e`, source revision `b0e5ea24`).
 
 ## Scope and limitations
 
@@ -98,7 +98,7 @@ The published demo at <https://migrant620.github.io/luma/> is built from this re
 
 ## Commission a prototype
 
-Have an app whose screens you want to put in front of your team, a client or investors? I recreate chosen app interfaces and flows as high-fidelity, interactive prototypes and hand over the source code. [Open an issue](https://github.com/migrant620/luma-ui/issues/new?title=Prototype%20enquiry) with the app, the flow you need and your timeline.
+Have an app whose screens you want to put in front of your team, a client or investors? I recreate chosen app interfaces and flows as high-fidelity, interactive prototypes and hand over the source code. [Open an issue](https://github.com/migrant620/luma-clone/issues/new?title=Prototype%20enquiry) with the app, the flow you need and your timeline.
 
 ## License
 
