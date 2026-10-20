@@ -342,7 +342,7 @@ function HomeScreen({ onOpenDetail, onScroll, onProfile }: { onOpenDetail: (id: 
           return (
           <View key={ev.id}>
             {showDate && (
-              <View style={[styles.dateDivider, styles.dateSticky, i > 0 && { marginTop: 10 }]}>
+              <View style={[styles.dateDivider, styles.dateSticky, i > 0 && { marginTop: 10.2 }]}>
                 <Text style={styles.dateBold}>{ev.dateLabel}</Text>
                 <Text style={styles.dateSlash}> / </Text>
                 <Text style={styles.dateDay}>{ev.dayLabel}</Text>
@@ -372,7 +372,7 @@ function HomeScreen({ onOpenDetail, onScroll, onProfile }: { onOpenDetail: (id: 
                 )}
                 <Text style={styles.feedTitle} numberOfLines={2}>{ev.title}</Text>
                 {ev.inlineMeta && ev.location ? (
-                  <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 11.2, flexWrap: 'wrap' }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10.3, flexWrap: 'wrap' }}>
                     <ClockIcon size={14} />
                     <Text style={[styles.metaText, { marginLeft: 6 }]}>{ev.time}</Text>
                     <View style={{ width: 16.5 }} />
@@ -386,7 +386,7 @@ function HomeScreen({ onOpenDetail, onScroll, onProfile }: { onOpenDetail: (id: 
                       <Text style={[styles.metaText, { marginLeft: 6 }]}>{ev.time}</Text>
                     </View>
                     {ev.location ? (
-                      <View style={[styles.metaRow, { marginTop: 7 }]}>
+                      <View style={[styles.metaRow, { marginTop: 7.8 }]}>
                         <PinIcon size={14} />
                         <Text style={[styles.metaText, { marginLeft: 6 }]}>{ev.location}</Text>
                       </View>
@@ -432,7 +432,7 @@ function GoingAvatars({ names }: { names: string }) {
   const uid = React.useId();
   const initials = names.split(', ').slice(0, goingAttendees.length).map((n) => n.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase());
   return (
-    <View style={styles.detailGoingRow}>
+    <View style={styles.detailGoingRow} {...({ 'aria-hidden': true } as object)}>
       {goingAttendees.map((a, i) => (
         <View key={a.initials} style={[styles.goingAvatar, i > 0 && styles.goingAvatarOverlap]}>
           <Svg width={28} height={28} viewBox="0 0 28 28" style={{ position: 'absolute' } as any}>
@@ -444,20 +444,21 @@ function GoingAvatars({ names }: { names: string }) {
             </Defs>
             <Circle cx="14" cy="14" r="14" fill={`url(#${uid}-${i})`} />
           </Svg>
-          <Text style={styles.goingAvatarInitial}>{initials[i] ?? a.initials}</Text>
+          <Text style={styles.goingAvatarInitial} {...({ 'aria-hidden': true } as object)}>{initials[i] ?? a.initials}</Text>
         </View>
       ))}
     </View>
   );
 }
 
-function CalendarPlusIcon({ size = 24, color = '#000000' }: any) {
+function TicketPlusIcon({ size = 24, color = '#000000' }: { size?: number; color?: string }) {
   return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-      <Rect x="3.5" y="5" width="17" height="16" rx="3" />
-      <Path d="M3.5 9.5 H20.5" />
-      <Path d="M8 3 v3 M16 3 v3" />
-      <Path d="M12 12.5 v4 M10 14.5 h4" />
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Path
+        fill={color}
+        d="M5.5 4.5h13a2.5 2.5 0 0 1 2.5 2.5v2.6a2.4 2.4 0 0 0 0 4.8V17a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17v-2.6a2.4 2.4 0 0 0 0-4.8V7a2.5 2.5 0 0 1 2.5-2.5z"
+      />
+      <Path d="M12 8.6v6.8M8.6 12h6.8" stroke="#FFFFFF" strokeWidth={2.2} strokeLinecap="round" />
     </Svg>
   );
 }
@@ -525,6 +526,8 @@ function PopularCard({ ev, cover, preview, onPress, isLast, isFirst }: { ev?: an
   );
 }
 
+const DISCOVER_TRACK = { popular: 0.065, browse: -0.22 };
+
 const DISCOVER_RULES = [590.6, 629.9, 639.0, 678.3];
 
 function DiscoverScreen({ onOpenDetail, onScroll, onProfile }: { onOpenDetail: (id: string) => void; onScroll?: (y: number) => void; onProfile: () => void }) {
@@ -551,9 +554,9 @@ function DiscoverScreen({ onOpenDetail, onScroll, onProfile }: { onOpenDetail: (
       <ScrollView style={styles.scroll} contentContainerStyle={{ paddingBottom: 120 }} showsVerticalScrollIndicator={false}
         scrollEventThrottle={16} onScroll={(e: any) => onScroll?.(e.nativeEvent.contentOffset.y)}>
         <View style={styles.discCityRow}>
-          <View>
+          <View style={{ paddingTop: 0.55 }}>
             <Text style={styles.discCity}>San Francisco</Text>
-            <Text style={styles.discPopular}>Popular Events</Text>
+            <Text style={[styles.discPopular, { letterSpacing: DISCOVER_TRACK.popular }]}>Popular Events</Text>
           </View>
           <View style={{ flex: 1 }} />
           <Text style={styles.discViewAll}>View All</Text>
@@ -574,7 +577,7 @@ function DiscoverScreen({ onOpenDetail, onScroll, onProfile }: { onOpenDetail: (
           </View>
         </ScrollView>
 
-        <Text style={styles.browseTitle}>Browse by Category</Text>
+        <Text style={[styles.browseTitle, { letterSpacing: DISCOVER_TRACK.browse }]}>Browse by Category</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.catRow}
           contentContainerStyle={{ paddingHorizontal: 16, gap: 8 }}>
           {row1.map((cat) => (
@@ -626,9 +629,14 @@ function MailGlyph({ size = 20, color = '#E8EAEE' }: any) {
   );
 }
 
+const ACTION_LABEL_TRACK = { register: -0.07, contact: -0.3, more: -0.15 };
+
+const DETAIL_TITLE_PIN_Y = 472.8;
+
 function DetailScreen({ eventId, onBack }: { eventId: string | null; onBack: () => void }) {
   const ev = (eventId && detailEvents[eventId]) || detailEvent;
   const [pinned, setPinned] = React.useState(false);
+  const [sheet, setSheet] = React.useState<DetailSheetKind | null>(null);
   const [bgCss, setBgCss] = React.useState<string | null>(null);
   React.useEffect(() => {
     let alive = true;
@@ -653,8 +661,8 @@ function DetailScreen({ eventId, onBack }: { eventId: string | null; onBack: () 
           <ShareIcon size={24} color="#fff" />
         </TouchableOpacity>
       </View>
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 40 }} showsVerticalScrollIndicator={false}
-        onScroll={(e: any) => setPinned(e.nativeEvent.contentOffset.y > 210)} scrollEventThrottle={64}>
+      <ScrollView style={styles.detailScroll} contentContainerStyle={{ paddingBottom: 40 }} showsVerticalScrollIndicator={false}
+        onScroll={(e: any) => setPinned(e.nativeEvent.contentOffset.y > DETAIL_TITLE_PIN_Y)} scrollEventThrottle={16}>
         <View style={styles.detailCoverWrap}>
           <Image source={ev.cover} style={styles.detailCover as any} resizeMode="cover" />
           <View style={styles.detailFeatured}>
@@ -671,17 +679,17 @@ function DetailScreen({ eventId, onBack }: { eventId: string | null; onBack: () 
           <Text style={styles.detailTime}>{ev.time}</Text>
 
           <View style={styles.detailActions}>
-            <TouchableOpacity style={[styles.detailAction, styles.detailActionPrimary]} accessibilityLabel="Register" activeOpacity={0.8}>
-              <CalendarPlusIcon size={24} color="#000000" />
-              <Text style={[styles.detailActionLabel, styles.detailActionLabelPrimary]}>Register</Text>
+            <TouchableOpacity style={[styles.detailAction, styles.detailActionPrimary]} accessibilityLabel="Register" activeOpacity={0.8} onPress={() => setSheet('register')}>
+              <TicketPlusIcon size={24} color="#000000" />
+              <Text style={[styles.detailActionLabel, styles.detailActionLabelPrimary, { letterSpacing: ACTION_LABEL_TRACK.register }]}>Register</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.detailAction} accessibilityLabel="Contact" activeOpacity={0.8}>
-              <EnvelopeIcon size={24} color="#FFFFFF" />
-              <Text style={styles.detailActionLabel}>Contact</Text>
+              <EnvelopeIcon size={24} color="#D1D4DD" />
+              <Text style={[styles.detailActionLabel, { letterSpacing: ACTION_LABEL_TRACK.contact }]}>Contact</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.detailAction} accessibilityLabel="More" activeOpacity={0.8}>
-              <MoreDotsIcon size={24} color="#FFFFFF" />
-              <Text style={styles.detailActionLabel}>More</Text>
+            <TouchableOpacity style={styles.detailAction} accessibilityLabel="More" activeOpacity={0.8} onPress={() => setSheet('more')}>
+              <MoreDotsIcon size={24} color="#D1D4DD" />
+              <Text style={[styles.detailActionLabel, { letterSpacing: ACTION_LABEL_TRACK.more }]}>More</Text>
             </TouchableOpacity>
           </View>
 
@@ -741,15 +749,55 @@ function DetailScreen({ eventId, onBack }: { eventId: string | null; onBack: () 
         </View>
       </ScrollView>
       <HomeIndicator theme="dark" />
+      {sheet && <DetailSheet kind={sheet} onClose={() => setSheet(null)} />}
+    </View>
+  );
+}
+
+type DetailSheetKind = 'register' | 'more';
+
+function DetailSheet({ kind, onClose }: { kind: DetailSheetKind; onClose: () => void }) {
+  return (
+    <View style={styles.sheetLayer} accessibilityViewIsModal={true}>
+      <TouchableOpacity style={styles.sheetScrim} accessibilityLabel="Close" activeOpacity={1} onPress={onClose} />
+      <View style={styles.sheetPanel} accessibilityRole={'dialog' as any}>
+        <View style={styles.sheetGrabber} />
+        {kind === 'register' ? (
+          <>
+            <Text style={styles.sheetHeading}>Registration</Text>
+            <View style={styles.sheetNotice}>
+              <View style={styles.sheetNoticeIcon}><LockIcon size={20} /></View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.sheetNoticeTitle}>Approval Required</Text>
+                <Text style={styles.sheetNoticeBody}>Your registration is subject to host approval.</Text>
+              </View>
+            </View>
+            <Text style={styles.sheetBody}>Welcome! To join the event, please register below.</Text>
+            <TouchableOpacity style={styles.sheetPrimaryBtn} accessibilityRole="button" activeOpacity={0.85} onPress={onClose}>
+              <Text style={styles.sheetPrimaryText}>Request to Join</Text>
+            </TouchableOpacity>
+          </>
+        ) : (
+          <>
+            <TouchableOpacity style={styles.sheetRow} accessibilityRole="button" activeOpacity={0.7} onPress={onClose}>
+              <Text style={styles.sheetRowText}>Contact the Host</Text>
+            </TouchableOpacity>
+            <View style={styles.sheetRule} />
+            <TouchableOpacity style={styles.sheetRow} accessibilityRole="button" activeOpacity={0.7} onPress={onClose}>
+              <Text style={styles.sheetRowText}>Report Event</Text>
+            </TouchableOpacity>
+          </>
+        )}
+      </View>
     </View>
   );
 }
 
 const galleryCats = [
-  { id: 'suggested', label: 'Suggested', track: 0.0, icon: <SparkleIcon size={17} color="#151516" /> },
-  { id: 'school', label: 'School', track: 0.05, icon: <CatTech size={17} color="#8E8E93" /> },
-  { id: 'halloween', label: 'Halloween', track: 0.15, icon: <CatGames size={17} color="#8E8E93" /> },
-  { id: 'thanksgiving', label: 'Thanksgiving', track: 0.42, icon: <CatFood size={17} color="#8E8E93" /> },
+  { id: 'suggested', label: 'Suggested', track: 0.09, icon: <SparkleIcon size={17} color="#151516" /> },
+  { id: 'school', label: 'School', track: 0.2, icon: <CatTech size={17} color="#8E8E93" /> },
+  { id: 'halloween', label: 'Halloween', track: 0.26, icon: <CatGames size={17} color="#8E8E93" /> },
+  { id: 'thanksgiving', label: 'Thanksgiving', track: 0.52, icon: <CatFood size={17} color="#8E8E93" /> },
 ];
 
 const galleryTiles = [
@@ -874,6 +922,8 @@ function CoverGallery({ onBack, onPick }: { onBack: () => void; onPick: (cover: 
 
 function CreateScreen({ onBack }: { onBack: () => void }) {
   const [approval, setApproval] = React.useState(false);
+  const [draftPrompt, setDraftPrompt] = React.useState(true);
+  const [eventName, setEventName] = React.useState('');
   const [gallery, setGallery] = React.useState(false);
   const [cover, setCover] = React.useState<any>(null);
   if (gallery) return <CoverGallery onBack={() => setGallery(false)} onPick={(c) => { setCover(c); setGallery(false); }} />;
@@ -893,13 +943,15 @@ function CreateScreen({ onBack }: { onBack: () => void }) {
         </View>
       </View>
       <ScrollView style={styles.scroll} contentContainerStyle={{ paddingBottom: 130 }} showsVerticalScrollIndicator={false}>
+        {draftPrompt && (
         <View style={styles.restorePill}>
           <View style={styles.restoreClock}><ClockIcon size={18} color={colors.inkMuted} /></View>
           <Text style={styles.restoreText} numberOfLines={1}>Restore draft?</Text>
-          <TouchableOpacity accessibilityRole="button" style={styles.restoreClose} activeOpacity={0.7}>
+          <TouchableOpacity accessibilityRole="button" style={styles.restoreClose} activeOpacity={0.7} onPress={() => setDraftPrompt(false)}>
             <CloseX size={18} color={colors.inkMuted} />
           </TouchableOpacity>
         </View>
+        )}
         <TouchableOpacity
           style={styles.coverUpload}
           accessibilityRole="button"
@@ -913,9 +965,20 @@ function CreateScreen({ onBack }: { onBack: () => void }) {
           </TouchableOpacity>
         </TouchableOpacity>
         <View style={styles.inputField}>
-          <Text style={styles.eventNameHint}>Event Name</Text>
+          {eventName === '' && (
+            <Text style={styles.eventNameHint} pointerEvents="none">Event Name</Text>
+          )}
+          <TextInput
+            value={eventName}
+            onChangeText={setEventName}
+            accessibilityLabel="Event Name"
+            style={styles.eventNameInput}
+            maxLength={140}
+            returnKeyType="done"
+          />
         </View>
         <View style={styles.timeCard}>
+          <View style={styles.timeCardRule} pointerEvents="none" />
           <View style={styles.timeLineRow}>
             <View style={styles.timelineCol}>
               <View style={styles.timeDotFilled} />
@@ -957,7 +1020,6 @@ function CreateScreen({ onBack }: { onBack: () => void }) {
           </TouchableOpacity>
         </View>
       </ScrollView>
-      <View style={[styles.hairline, { top: 496.3 }]} pointerEvents="none" />
       <HomeIndicator />
     </View>
   );
@@ -969,7 +1031,7 @@ function EmptyScreen({ title, desc, notif = false, chat = false, onProfile }: { 
       <StatusBar />
       <View style={styles.homeHeader}>
         <HeaderAvatar onPress={onProfile} />
-        <Text style={styles.screenTitle}>{title}</Text>
+        <Text style={[styles.screenTitle, notif && { letterSpacing: -0.145 }]}>{title}</Text>
         <View style={{ flex: 1 }} />
         {chat && (
           <View accessibilityRole="button" accessibilityLabel="New Chat" style={[styles.headerIconBtn, { marginRight: 4 }]}>
@@ -995,25 +1057,30 @@ function EmptyScreen({ title, desc, notif = false, chat = false, onProfile }: { 
   );
 }
 
+const TAB_LABEL_WEIGHT = '600' as const;
+const TAB_LABEL_TRACK = { home: -0.39, discover: -0.115, notif: -0.19, chat: -0.19 };
+const TAB_FRAME_W = 393;
+const tabs = [
+  { id: 'home', label: 'Home', icon: HomeIcon, x: 0, w: 92.1, track: TAB_LABEL_TRACK.home },
+  { id: 'discover', label: 'Discover', icon: DiscoverIcon, x: 100.1, w: 92.1, track: TAB_LABEL_TRACK.discover },
+  { id: 'notif', label: 'Notifications', icon: HeartIcon, x: 200.1, w: 92.4, track: TAB_LABEL_TRACK.notif },
+  { id: 'chat', label: 'Chat', icon: ChatIcon, x: 300.6, w: 92.4, track: TAB_LABEL_TRACK.chat },
+];
+const pct = (v: number) => `${(v / TAB_FRAME_W) * 100}%` as `${number}%`;
+
 function TabBar({ active, onChange }: { active: string; onChange: (t: string) => void }) {
-  const tabs = [
-    { id: 'home', label: 'Home', icon: HomeIcon },
-    { id: 'discover', label: 'Discover', icon: DiscoverIcon },
-    { id: 'notif', label: 'Notifications', icon: HeartIcon },
-    { id: 'chat', label: 'Chat', icon: ChatIcon },
-  ];
   return (
     <View style={styles.tabBar}>
-      <View style={styles.tabBarFill} pointerEvents="none" />
+      <View style={styles.tabBarFill} />
       {tabs.map((t) => {
         const I = t.icon;
         const isActive = active === t.id;
         return (
-          <TouchableOpacity key={t.id} style={styles.tabItem} onPress={() => onChange(t.id)} activeOpacity={0.7} accessibilityLabel={t.label}>
+          <TouchableOpacity key={t.id} style={[styles.tabItem, { left: pct(t.x), width: pct(t.w) }]} onPress={() => onChange(t.id)} activeOpacity={0.7} accessibilityLabel={t.label}>
             <View style={[styles.tabIconWrap, isActive && styles.tabPillActive]}>
               <I size={24} color={isActive ? colors.ink : colors.inkSecondary} filled={isActive} />
             </View>
-            <Text style={[styles.tabLabel, { color: isActive ? colors.ink : colors.inkSecondary, fontWeight: isActive ? '700' : '600' }]}>{t.label}</Text>
+            <Text style={[styles.tabLabel, { color: isActive ? colors.ink : colors.inkSecondary, letterSpacing: t.track }]}>{t.label}</Text>
           </TouchableOpacity>
         );
       })}
@@ -1108,14 +1175,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff', borderTopLeftRadius: 28, borderTopRightRadius: 28,
   },
   grabber: { position: 'absolute', top: -13, width: 40, height: 4, backgroundColor: '#DCDCE0', borderRadius: 2, alignSelf: 'center' },
-  loginSub: { position: 'absolute', top: 24, left: 32, right: 32, fontSize: 15, color: '#737373', textAlign: 'center', lineHeight: 20, fontWeight: '400', letterSpacing: -0.18 },
-  phoneBtn: { position: 'absolute', top: 83, left: 16, right: 16, height: 50, paddingHorizontal: 12, backgroundColor: colors.btnBlack, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
-  phoneBtnText: { width: '100%', textAlign: 'center', color: '#fff', fontSize: 16.3, fontWeight: '500' },
-  emailBtn: { position: 'absolute', top: 142, left: 16, right: 16, height: 50, paddingHorizontal: 12, backgroundColor: '#EDEDED', borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
-  emailBtnText: { width: '100%', textAlign: 'center', color: colors.ink, fontSize: 16.3, fontWeight: '500' },
-  oauthRow: { position: 'absolute', top: 200, left: 16, right: 16, height: 50, flexDirection: 'row', gap: 12 },
-  oauthBtn: { flex: 1, height: 50, backgroundColor: '#EDEDED', borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
-  terms: { position: 'absolute', top: 270, left: 0, right: 0, fontSize: 11.8, color: colors.inkMuted, textAlign: 'center', fontWeight: '400' },
+  loginSub: { position: 'absolute', top: 23.4, left: 32, right: 32, fontSize: 15, color: '#737373', textAlign: 'center', lineHeight: 19.45, fontWeight: '400', letterSpacing: -0.18 },
+  phoneBtn: { position: 'absolute', top: 82.4, left: 16, right: 16, height: 50.2, paddingHorizontal: 12, backgroundColor: colors.btnBlack, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+  phoneBtnText: { width: '100%', textAlign: 'center', color: '#fff', fontSize: 16.3, fontWeight: '500', lineHeight: 23.3 },
+  emailBtn: { position: 'absolute', top: 140.6, left: 16, right: 16, height: 50.2, paddingHorizontal: 12, backgroundColor: '#EDEDED', borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+  emailBtnText: { width: '100%', textAlign: 'center', color: colors.ink, fontSize: 16.3, fontWeight: '500', lineHeight: 23.3 },
+  oauthRow: { position: 'absolute', top: 198.8, left: 16, right: 16, height: 50.2, flexDirection: 'row', gap: 12 },
+  oauthBtn: { flex: 1, height: 50.2, backgroundColor: '#EDEDED', borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+  terms: { position: 'absolute', top: 269.1, left: 0, right: 0, fontSize: 11.8, color: colors.inkMuted, textAlign: 'center', fontWeight: '400' },
   termsLink: { position: 'absolute' as const, right: 63.7, top: 0, color: '#151516' },
 
   homeHeader: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingTop: 4, paddingBottom: 0, gap: 8 },
@@ -1130,13 +1197,13 @@ const styles = StyleSheet.create({
   sectionHeader: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, marginTop: 8 },
   sectionTitle: { fontSize: 19, fontWeight: '700', color: colors.ink },
   viewAll: { fontSize: 16, color: colors.inkMuted, fontWeight: '400', flexDirection: 'row' },
-  pickedTitle: { fontSize: 19, fontWeight: '700', color: colors.ink, paddingHorizontal: 16, marginTop: 26.6 },
+  pickedTitle: { fontSize: 19, fontWeight: '700', color: colors.ink, paddingHorizontal: 16, marginTop: 24.5 },
   popularTitle: { fontSize: 19, fontWeight: '600', color: colors.inkMuted, paddingHorizontal: 16, marginTop: 2 },
 
   emptyCard: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, marginTop: 18, gap: 16 },
   emptyIcon: { width: 64, height: 64, borderRadius: 15, backgroundColor: colors.emptyTile, alignItems: 'center', justifyContent: 'center' },
   emptyTitle: { fontSize: 16, fontWeight: '500', color: colors.inkMuted },
-  emptyDesc: { fontSize: 14, color: colors.inkMuted, marginTop: 6.2, lineHeight: 18 },
+  emptyDesc: { fontSize: 14, color: colors.inkMuted, marginTop: 6.2, lineHeight: 19.45 },
 
   nearbyRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, marginTop: 3.3 },
   nearbyText: { fontSize: 19, color: colors.inkMuted, fontWeight: '500' },
@@ -1147,9 +1214,9 @@ const styles = StyleSheet.create({
   dateSlash: { fontSize: 16, color: colors.inkMuted, marginRight: 6 },
   dateDay: { fontSize: 16, color: colors.inkMuted, letterSpacing: -0.68, paddingRight: 4.8 },
 
-  feedRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, marginTop: 10, paddingBottom: 16 },
+  feedRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, marginTop: 10.3, paddingBottom: 16 },
   feedCover: { width: 80, height: 80, borderRadius: 12, backgroundColor: '#E8E8EC', alignSelf: 'flex-start' },
-  feedBody: { flex: 1, marginLeft: 12, justifyContent: 'flex-start' },
+  feedBody: { flex: 1, marginLeft: 12.1, justifyContent: 'flex-start' },
   hostRow: { flexDirection: 'row', alignItems: 'center', minHeight: 16, marginTop: 3, marginBottom: 2.9 },
   hostDot: { width: 16, height: 16, borderRadius: 8, marginRight: 7 },
   hostName: { fontSize: 12, color: colors.inkSecondary, fontWeight: '400' },
@@ -1164,7 +1231,7 @@ const styles = StyleSheet.create({
   discPopular: { fontSize: 19, fontWeight: '500', color: colors.inkMuted, lineHeight: 25, marginTop: 2.35 },
   discViewAll: { fontSize: 16, color: colors.inkMuted, marginTop: 3 },
 
-  popularGrid: { marginTop: 16 },
+  popularGrid: { marginTop: 15.45 },
   popularColumn: { width: 343.5 },
   popCardWrap: { width: 343.5, height: 133 },
   popCard: { height: 116, width: 343.5, flexDirection: 'row', paddingLeft: 16 },
@@ -1181,19 +1248,35 @@ const styles = StyleSheet.create({
 
   browseTitle: { fontSize: 19, fontWeight: '700', color: colors.ink, paddingHorizontal: 16, marginTop: 22 },
   catRow: { marginTop: 13 },
-  catRow2: { marginTop: 0 },
-  catChip: { flexDirection: 'row', alignItems: 'center', paddingLeft: 12, paddingRight: 9, height: 48, borderWidth: 1, borderColor: '#F0F0F1', borderRadius: 15, gap: 8, backgroundColor: colors.white },
+  catRow2: { marginTop: 0.4 },
+  catChip: { flexDirection: 'row', alignItems: 'center', paddingLeft: 11.2, paddingRight: 12.1, height: 48, borderWidth: 1, borderColor: '#F0F0F1', borderRadius: 15, gap: 8, backgroundColor: colors.white },
   catLabel: { fontSize: 15, fontWeight: '500', color: colors.ink },
   citiesRow: { flexDirection: 'row', alignItems: 'flex-start', paddingHorizontal: 16, marginTop: 17.65 },
   discCities: { fontSize: 19, fontWeight: '700', color: colors.ink, lineHeight: 25, width: 53.1 },
   citiesMore: { width: 79, height: 13.5, marginTop: 0.55, alignItems: 'center', justifyContent: 'center' },
 
   detailRoot: { flex: 1, height: '100%', backgroundColor: colors.detailBg },
+  sheetLayer: { position: 'absolute' as const, top: 0, left: 0, right: 0, bottom: 0, zIndex: 40, justifyContent: 'flex-end' },
+  sheetScrim: { position: 'absolute' as const, top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.45)' },
+  sheetPanel: { backgroundColor: '#FFFFFF', borderTopLeftRadius: 28, borderTopRightRadius: 28, paddingHorizontal: 16, paddingTop: 28, paddingBottom: 34 },
+  sheetGrabber: { position: 'absolute' as const, top: 12, alignSelf: 'center', width: 40, height: 4, borderRadius: 2, backgroundColor: '#DCDCE0' },
+  sheetHeading: { fontSize: 16, fontWeight: '600', color: colors.ink, marginBottom: 12 },
+  sheetNotice: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, backgroundColor: colors.bgGray, borderRadius: 12, padding: 12 },
+  sheetNoticeIcon: { width: 28, height: 28, borderRadius: 14, backgroundColor: '#EDEDED', alignItems: 'center', justifyContent: 'center' },
+  sheetNoticeTitle: { fontSize: 16, fontWeight: '600', color: colors.ink, lineHeight: 21 },
+  sheetNoticeBody: { fontSize: 14, color: '#737373', lineHeight: 19, marginTop: 2 },
+  sheetBody: { fontSize: 15, color: '#737373', lineHeight: 20, marginTop: 16 },
+  sheetPrimaryBtn: { height: 50, borderRadius: 12, backgroundColor: colors.btnBlack, alignItems: 'center', justifyContent: 'center', marginTop: 16 },
+  sheetPrimaryText: { color: '#FFFFFF', fontSize: 16.3, fontWeight: '500' },
+  sheetRow: { height: 50, justifyContent: 'center' },
+  sheetRowText: { fontSize: 16.3, fontWeight: '500', color: colors.ink },
+  sheetRule: { height: 1, backgroundColor: colors.divider },
   detailStatusWrap: { position: 'absolute' as const, top: 0, left: 0, right: 0, zIndex: 11 },
   detailNav: { position: 'absolute' as const, top: 0, left: 0, right: 0, zIndex: 10, flexDirection: 'row', justifyContent: 'space-between', paddingLeft: 8, paddingRight: 12, paddingTop: 4, paddingBottom: 8 },
   detailNavPinned: { backgroundColor: 'rgba(16,14,30,0.72)', ...(Platform.OS === 'web' ? ({ backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)' } as any) : {}) },
   detailNavBtn: { width: 48, height: 48, borderRadius: 24, backgroundColor: 'rgba(255,255,255,0.08)', alignItems: 'center', justifyContent: 'center' },
-  detailCoverWrap: { marginHorizontal: 16, marginTop: 65, borderRadius: 22, overflow: 'hidden' as const },
+  detailScroll: { position: 'absolute' as const, top: 64, left: 0, right: 0, bottom: 0, overflow: 'hidden' as const },
+  detailCoverWrap: { marginHorizontal: 16, marginTop: 1, borderRadius: 22, overflow: 'hidden' as const },
   detailCover: { width: '100%', height: 393, backgroundColor: '#1a1a2e' },
   featuredBar: { backgroundColor: 'rgba(0,0,0,0.5)', paddingVertical: 10, alignItems: 'center' },
   featuredText: { color: '#fff', fontSize: 14, fontWeight: '500' },
@@ -1202,26 +1285,26 @@ const styles = StyleSheet.create({
   detailHostRow: { flexDirection: 'row', alignItems: 'center', minHeight: 16, marginTop: 13.3 },
   detailHost: { fontSize: 16, color: colors.detailMuted, marginLeft: 6.2 },
   detailTime: { fontSize: 16, color: colors.detailMuted, marginTop: 11 },
-  detailActions: { flexDirection: 'row', gap: 6, height: 55.3, marginTop: 15.45 },
+  detailActions: { flexDirection: 'row', gap: 6, height: 55.3, marginTop: 17.15 },
   detailAction: {
     flex: 1, height: 55.3, backgroundColor: 'rgba(255,255,255,0.09)', borderRadius: 16,
-    flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4,
+    flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingTop: 7.5, gap: 0.85,
   },
   detailActionPrimary: { backgroundColor: '#FFFFFF' },
-  detailActionLabel: { color: '#FFFFFF', fontSize: 14, fontWeight: '600', textAlign: 'center' },
+  detailActionLabel: { color: '#D1D4DD', fontSize: 12, fontWeight: '500', textAlign: 'center' },
   detailActionLabelPrimary: { color: '#000000' },
   detailSection: { fontSize: 16, fontWeight: '600', color: colors.detailMuted, marginTop: 0 },
-  detailSectionFirst: { marginTop: 24.75 },
+  detailSectionFirst: { marginTop: 23.05 },
   detailSectionInline: { fontSize: 16, fontWeight: '600', color: colors.detailMuted },
-  detailSectionGoing: { marginTop: 2.15 },
-  detailSectionAbout: { marginTop: 22.9 },
+  detailSectionGoing: { marginTop: 23.3 },
+  detailSectionAbout: { marginTop: 21.6 },
   detailDivider: { height: 1, backgroundColor: 'rgba(255,255,255,0.15)', marginTop: 13, marginBottom: 0 },
-  detailLocation: { fontSize: 20, fontWeight: '500', color: colors.detailText, lineHeight: 24, marginTop: 3.7 },
-  detailAddress: { fontSize: 16, color: colors.detailMuted, marginTop: 1.8, lineHeight: 19 },
+  detailLocation: { fontSize: 20, fontWeight: '500', color: colors.detailText, lineHeight: 24, marginTop: 4.8 },
+  detailAddress: { fontSize: 16, color: colors.detailMuted, marginTop: 1.8, lineHeight: 19.45 },
   detailFeatured: { position: 'absolute' as const, left: 0, right: 0, bottom: 0, height: 34, backgroundColor: 'rgba(6,10,24,0.72)', alignItems: 'center', justifyContent: 'center' },
-  detailFeaturedText: { color: '#E8EAEE', fontSize: 13, fontWeight: '500' },
-  detailPinnedTitle: { flex: 1, color: colors.detailText, fontSize: 18, fontWeight: '600', marginHorizontal: 8 },
-  detailMap: { marginTop: 13.25, height: 120.1, borderRadius: 14, backgroundColor: '#EAE6DC', overflow: 'hidden' as const },
+  detailFeaturedText: { color: '#CCCED4', fontSize: 12, fontWeight: '500' },
+  detailPinnedTitle: { flex: 1, alignSelf: 'center', color: colors.detailText, fontSize: 18, fontWeight: '600', marginHorizontal: 8 },
+  detailMap: { marginTop: 12.25, height: 120.1, borderRadius: 14, backgroundColor: '#EAE6DC', overflow: 'hidden' as const },
   mapBlock: { position: 'absolute' as const, backgroundColor: '#F4F0E6', borderRadius: 3 },
   mapPark: { position: 'absolute' as const, backgroundColor: '#DCEBD8', borderRadius: 3 },
   mapRoad: { position: 'absolute' as const, left: 0, right: 0, backgroundColor: '#FFFFFF' },
@@ -1230,19 +1313,19 @@ const styles = StyleSheet.create({
   mapPinTip: { width: 0, height: 0, borderLeftWidth: 6, borderRightWidth: 6, borderTopWidth: 9, borderLeftColor: 'transparent', borderRightColor: 'transparent', borderTopColor: '#EA4335', marginTop: -2 },
   mapLabel: { position: 'absolute' as const, left: 10, top: 12, color: '#5C6068', fontSize: 12, fontWeight: '500', lineHeight: 15 },
   detailHostHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 11.65 },
-  detailHostContact: { fontSize: 16, color: colors.detailText, fontWeight: '500' },
+  detailHostContact: { fontSize: 13.5, color: '#B4B5B9', fontWeight: '500' },
   detailHostContactBtn: { width: 54.2, height: 48, alignItems: 'center', justifyContent: 'center' },
   detailDividerTight: { height: 1, backgroundColor: 'rgba(255,255,255,0.15)', marginTop: 5 },
-  detailSpeakerRow: { flexDirection: 'row', alignItems: 'flex-start', marginTop: 1.75 },
-  detailSpeakerAvatar: { width: 44, height: 44, borderRadius: 22, marginRight: 14 },
-  detailSpeakerName: { fontSize: 17, fontWeight: '600', color: colors.detailText },
-  detailSpeakerRole: { fontSize: 14, color: colors.detailMuted, marginTop: 22.2 },
+  detailSpeakerRow: { flexDirection: 'row', alignItems: 'flex-start', marginTop: 2.75 },
+  detailSpeakerAvatar: { width: 32, height: 32, borderRadius: 16, marginRight: 10.2, marginTop: 4.5 },
+  detailSpeakerName: { fontSize: 16, fontWeight: '600', color: colors.detailText, lineHeight: 20 },
+  detailSpeakerRole: { fontSize: 13, color: colors.detailMuted, marginTop: 4, lineHeight: 16.4 },
   detailGoingRow: { marginTop: 14, flexDirection: 'row', alignItems: 'center' },
   detailGoingNames: { fontSize: 15, color: colors.detailMuted, marginTop: 7.7, lineHeight: 20 },
   goingAvatar: { width: 28, height: 28, borderRadius: 14, borderWidth: 2, borderColor: colors.detailBg, alignItems: 'center', justifyContent: 'center' },
   goingAvatarOverlap: { marginLeft: -10 },
   goingAvatarInitial: { color: '#FFFFFF', fontSize: 11, fontWeight: '700', letterSpacing: 0.2 },
-  detailAboutMedia: { marginHorizontal: -16, marginTop: 6.8, height: 75.3, backgroundColor: '#0B1220' },
+  detailAboutMedia: { marginHorizontal: -16, marginTop: 5.75, height: 75.3, backgroundColor: '#0B1220' },
   detailAboutImage: { marginLeft: 16, marginTop: 17.1, width: 361.3, height: 58.2, backgroundColor: '#131C2E', borderRadius: 12 },
   detailAbout: { fontSize: 15, color: colors.detailText, marginTop: 12, lineHeight: 21 },
 
@@ -1252,21 +1335,21 @@ const styles = StyleSheet.create({
   gallerySearchBox: { flex: 1, height: 56, justifyContent: 'center' },
   gallerySearchPlaceholder: { fontSize: 19, fontWeight: '500', color: '#C4C4C5' },
   galleryCats: { flexDirection: 'row', paddingLeft: 4, borderBottomWidth: 1, borderBottomColor: '#ECECEF' },
-  galleryCat: { alignItems: 'center', paddingHorizontal: 12, paddingBottom: 10 },
-  galleryCatLabel: { fontSize: 14, color: '#C4C4C5', marginTop: 21.2, fontWeight: '500' },
+  galleryCat: { alignItems: 'center', paddingHorizontal: 12, paddingBottom: 9.6 },
+  galleryCatLabel: { fontSize: 14, color: '#C4C4C5', marginTop: 21.6, fontWeight: '500' },
   galleryCatActive: { color: colors.ink, fontWeight: '600' },
   galleryCatUnderline: { position: 'absolute' as const, bottom: -1, left: 12, right: 12, height: 2.5, backgroundColor: colors.ink },
   galleryScrollbar: { position: 'absolute' as const, right: 0, top: 56, width: 2.2, height: 67.3, backgroundColor: '#FFFFFF' },
-  galleryScroll: { flex: 1, marginBottom: 77 },
-  galleryHero: { marginTop: 11, height: 204.5, borderRadius: 20, backgroundColor: '#FF9500', overflow: 'hidden' as const },
+  galleryScroll: { flex: 1, marginBottom: 77.2 },
+  galleryHero: { marginTop: 12.1, height: 204.5, borderRadius: 20, backgroundColor: '#FF9500', overflow: 'hidden' as const },
   galleryHeroTitle: { position: 'absolute' as const, left: 16, top: 16, fontSize: 16, fontWeight: '600', color: '#FFFFFF' },
   galleryHeroCount: { position: 'absolute' as const, left: 16, top: 41, fontSize: 12.2, color: 'rgba(255,255,255,0.92)' },
   galleryHeroCardA: { position: 'absolute' as const, right: 78, top: 42, width: 140, height: 162, borderRadius: 12, transform: [{ rotate: '-8deg' }] },
   galleryHeroCardB: { position: 'absolute' as const, right: 10, top: 30, width: 124, height: 140, borderRadius: 12, transform: [{ rotate: '6deg' }] },
   galleryGrid: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 16, columnGap: 16, rowGap: 26.2 },
-  galleryTile: { width: 172.5, height: 145.2, borderRadius: 12, overflow: 'hidden' as const, backgroundColor: '#F4F4F6' },
-  galleryTileImg: { width: '100%', height: 97.7 },
-  galleryTileLabelWrap: { backgroundColor: '#FFFFFF', height: 47.5, alignItems: 'center', justifyContent: 'center' },
+  galleryTile: { width: 172.5, height: 172.5, borderRadius: 12, overflow: 'hidden' as const, backgroundColor: '#F4F4F6' },
+  galleryTileImg: { width: '100%', height: 124.6 },
+  galleryTileLabelWrap: { backgroundColor: '#FFFFFF', height: 47.9, alignItems: 'center', justifyContent: 'center' },
   galleryTileLabel: { fontSize: 15, color: colors.ink },
   galleryFooter: { position: 'absolute' as const, left: 16, right: 16, bottom: 15, height: 50.2, justifyContent: 'center' },
   galleryChooseBtn: { flex: 1, paddingHorizontal: 12, backgroundColor: '#2E2E30', borderRadius: 25, alignItems: 'center', justifyContent: 'center' },
@@ -1281,13 +1364,13 @@ const styles = StyleSheet.create({
   createRoot: { flex: 1, height: '100%', backgroundColor: '#F6F7F8' },
   iconBtn48: { width: 48, height: 48, alignItems: 'center', justifyContent: 'center' },
   createHeader: { flexDirection: 'row', alignItems: 'center', paddingLeft: 8, paddingRight: 16, paddingTop: 4, paddingBottom: 4, height: 56, gap: 8 },
-  createTitle: { fontSize: 19, fontWeight: '500', color: colors.ink, width: 116.1 },
+  createTitle: { fontSize: 19, fontWeight: '500', color: colors.ink, width: 116.1, letterSpacing: -0.13 },
   createAvatarGroup: { width: 54.2, height: 48, flexDirection: 'row', alignItems: 'center' },
   createAvatarTarget: { position: 'absolute' as const, left: 0, top: 9.8, width: 28, height: 28 },
   restorePill: { alignSelf: 'center', flexDirection: 'row', alignItems: 'flex-start', backgroundColor: '#EDEEEF', borderRadius: 20.75, width: 168.8, height: 41.5, paddingLeft: 12 },
   restoreClock: { marginTop: 11.75 },
   restoreText: { fontSize: 14, color: '#969798', marginLeft: 4, marginTop: 8, lineHeight: 18.9, flexShrink: 0 },
-  restoreClose: { width: 48, height: 41.5, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
+  restoreClose: { position: 'absolute', left: 126.6, top: 0, width: 48, height: 41.5, alignItems: 'center', justifyContent: 'center' },
   coverUpload: { width: 240.5, height: 240.5, alignSelf: 'center', backgroundColor: '#EDEEEF', borderRadius: 12, marginTop: 5.5 },
   coverUploadBtn: {
     position: 'absolute', right: 4, bottom: 4, width: 48, height: 48, borderRadius: 24,
@@ -1295,7 +1378,12 @@ const styles = StyleSheet.create({
   },
   inputField: { width: 361, height: 58.6, alignSelf: 'center', backgroundColor: '#fff', borderRadius: 26, justifyContent: 'center', paddingLeft: 16, marginTop: 30.2 },
   eventNameHint: { fontSize: 21, fontWeight: '500', color: '#C4C4C5', width: 119.7 },
-  timeCard: { width: 361, alignSelf: 'center', backgroundColor: '#fff', borderRadius: 24, marginTop: 12.7, height: 105.6, justifyContent: 'center' },
+  eventNameInput: {
+    position: 'absolute', left: 16, right: 16, top: 0, bottom: 0, fontSize: 21, fontWeight: '500', color: colors.ink,
+    ...(Platform.OS === 'web' ? ({ outlineStyle: 'none' } as object) : {}),
+  },
+  timeCard: { width: 361, alignSelf: 'center', backgroundColor: '#fff', borderRadius: 24, marginTop: 12.0, height: 104.8, justifyContent: 'center' },
+  timeCardRule: { position: 'absolute', top: 52.0, left: 44, right: 0, height: 1, backgroundColor: colors.divider },
   timeLineRow: { flexDirection: 'row', alignItems: 'center', height: 52.8, paddingLeft: 16, paddingRight: 16 },
   timelineCol: { width: 28, alignItems: 'center', justifyContent: 'center' },
   timeDotFilled: { width: 11, height: 11, borderRadius: 5.5, backgroundColor: '#A1A1A2' },
@@ -1309,14 +1397,14 @@ const styles = StyleSheet.create({
   timePillB: { width: 86.2, height: 48, alignItems: 'center', justifyContent: 'center', marginLeft: 6.1 },
   pillBox: { width: '100%', height: 36, borderRadius: 10, backgroundColor: '#F4F4F6', alignItems: 'center', justifyContent: 'center' },
   pillText: { fontSize: 16, fontWeight: '500', color: '#151516', width: '100%', textAlign: 'center' },
-  rowCard: { width: 361, height: 48, alignSelf: 'center', backgroundColor: '#fff', borderRadius: 20, flexDirection: 'row', alignItems: 'center', paddingLeft: 16, marginTop: 9.1 },
+  rowCard: { width: 361, height: 48, alignSelf: 'center', backgroundColor: '#fff', borderRadius: 20, flexDirection: 'row', alignItems: 'center', paddingLeft: 16, marginTop: 10.6 },
   rowCardTall: { width: 361, height: 52, alignSelf: 'center', backgroundColor: '#fff', borderRadius: 26, flexDirection: 'row', alignItems: 'center', paddingLeft: 16, marginTop: 10.5 },
   rowLabelLocation: { fontSize: 15.5, color: '#A1A1A2', width: 128.8, marginLeft: 6, fontWeight: '500' },
   rowLabelDesc: { fontSize: 15.5, color: '#A1A1A2', width: 122.3, marginLeft: 6, fontWeight: '500' },
   rowLabelApproval: { fontSize: 15.5, color: '#A1A1A2', width: 130.3, marginLeft: 8, fontWeight: '500' },
   ticketingDivider: { height: 1, backgroundColor: '#E5E6E7', marginTop: 24.8, marginHorizontal: 16 },
-  ticketingTitle: { fontSize: 14, fontWeight: '600', color: '#9C9C9E', width: 64.4, marginTop: 19, marginLeft: 16 },
-  approvalRow: { width: 361, height: 52, alignSelf: 'center', backgroundColor: '#fff', borderRadius: 22, flexDirection: 'row', alignItems: 'center', paddingLeft: 16, paddingRight: 16, marginTop: 12.1 },
+  ticketingTitle: { fontSize: 14, fontWeight: '600', color: '#9C9C9E', width: 64.4, marginTop: 19, marginLeft: 16, lineHeight: 18.9 },
+  approvalRow: { width: 361, height: 52, alignSelf: 'center', backgroundColor: '#fff', borderRadius: 22, flexDirection: 'row', alignItems: 'center', paddingLeft: 16, paddingRight: 16, marginTop: 11.2 },
   toggle: { width: 54, height: 32, borderRadius: 16, backgroundColor: '#D6D6DB', justifyContent: 'center', paddingHorizontal: 3 },
   toggleOn: { backgroundColor: '#1A1A1A' },
   toggleThumb: { width: 26, height: 26, borderRadius: 13, backgroundColor: '#fff' },
@@ -1325,7 +1413,7 @@ const styles = StyleSheet.create({
   emptyStateWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 30, paddingBottom: 34 },
   notifIllustration: { width: 250, height: 196 },
   bigEmptyTitle: { fontSize: 19.3, fontWeight: '600', color: '#737373', lineHeight: 25.1, marginTop: 18 },
-  bigEmptyDesc: { fontSize: 15, color: '#737373', textAlign: 'center', marginTop: 6.9, lineHeight: 19.5 },
+  bigEmptyDesc: { fontSize: 15, color: '#737373', textAlign: 'center', marginTop: 6.9, lineHeight: 19.45, alignSelf: 'stretch', marginHorizontal: 2 },
   startChatBtn: { marginTop: 25.5, height: 43.7, width: 106.3, borderRadius: 21.85, backgroundColor: colors.btnBlack, alignItems: 'center', justifyContent: 'center' },
   startChatText: { color: '#FFFFFF', fontSize: 16, fontWeight: '600' },
 
@@ -1337,10 +1425,10 @@ const styles = StyleSheet.create({
   tabBarFill: {
     position: 'absolute', top: 25, left: 0, right: 0, bottom: 0, backgroundColor: colors.tabBar,
   },
-  tabItem: { flex: 1, alignItems: 'center', justifyContent: 'flex-start', paddingTop: 0 },
+  tabItem: { position: 'absolute', top: 0, bottom: 0, alignItems: 'center', justifyContent: 'flex-start', paddingTop: 0 },
   tabIconWrap: { width: 56, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 16, marginTop: 20 },
   tabPillActive: { backgroundColor: colors.tabPill },
-  tabLabel: { fontSize: 12, marginTop: 13.7, letterSpacing: -0.19 },
+  tabLabel: { fontSize: 12, marginTop: 13.7, fontWeight: TAB_LABEL_WEIGHT },
   createFab: {
     position: 'absolute', right: 16, bottom: 79, flexDirection: 'row', alignItems: 'center',
     backgroundColor: colors.fab, borderRadius: 28, paddingHorizontal: 16, paddingVertical: 16,
