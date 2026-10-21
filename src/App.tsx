@@ -1,25 +1,25 @@
 import React from 'react';
 import {
   View, Text, TouchableOpacity, ScrollView, Image, StyleSheet,
-  Platform, Switch, TextInput,
+  Platform, TextInput,
 } from 'react-native';
-import Svg, { Defs, LinearGradient as SvgGradient, Rect, Stop, Path as SvgPath, Path, Circle } from 'react-native-svg';
-import { colors, fonts, spacing, radius, typeScale } from './tokens';
+import Svg, { Defs, LinearGradient as SvgGradient, Rect, Stop, Path, Circle } from 'react-native-svg';
+import { colors } from './tokens';
 import {
   HomeIcon, DiscoverIcon, HeartIcon, ChatIcon, SettingsGear,
   MapIcon, SearchIcon, ComposeIcon, ClockIcon, PinIcon, ChevronRight, ChevronDown,
-  BackArrow, ShareIcon, PlusIcon, CloseX, CalendarEmptyIcon,
+  BackArrow, ShareIcon, PlusIcon, CalendarEmptyIcon,
   ImageAddIcon, LocationPinInput, DescriptionIcon, LockIcon,
   GoogleIcon, PasskeyIcon,
   CatFamily, CatTech, CatFood, CatBooks, CatGames, CatAI, CatRunning,
   GearMark, SparkleIcon,
 } from './icons';
-import { feedEvents, popularEvents, categories, detailEvent, detailEvents, accountProfile } from './data';
+import { feedEvents, popularEvents, popularEventsNext, categories, detailEvent, detailEvents, accountProfile } from './data';
 import { EmailSignInScreen, LinkPhoneScreen, PasskeyPromptScreen, NotifyOptInScreen } from './screens/Onboarding';
 import { ProfileScreen } from './screens/Profile';
 import { ChatIllustration } from './components/ChatIllustration';
 import { extractCoverBackground } from './palette';
-import { useAppFonts } from './webfont';
+import { registerAppFont } from './webfont';
 
 if (Platform.OS === 'web' && typeof document !== 'undefined') {
   const fid = 'luma-font-face';
@@ -41,47 +41,15 @@ if (Platform.OS === 'web' && typeof document !== 'undefined') {
     `;
     document.head.appendChild(style);
   }
-  const fixWeight = () => {
-    try {
-      let src = '';
-      for (const ss of Array.from(document.styleSheets)) {
-        let rules: any[] = [];
-        try { rules = Array.from(ss.cssRules); } catch (e) { continue; }
-        for (const r of rules) {
-          if (r && r.constructor && r.constructor.name === 'CSSFontFaceRule'
-              && (r as any).style && (r as any).style.fontFamily === 'PlusJakartaSans') {
-            src = (r as any).style.src;
-          }
-        }
-      }
-      if (src) {
-        const s = document.createElement('style');
-        s.id = 'luma-vf-weight';
-        s.textContent = `@font-face{font-family:'PlusJakartaSans';src:${src};font-weight:200 800;font-display:swap;}`;
-        document.head.appendChild(s);
-        if (document.fonts && (document.fonts as any).ready) { (document.fonts as any).ready.then(() => { (document as any).body && document.body.setAttribute('data-fonts','ready'); }); }
-        return true;
-      }
-    } catch (e) {  }
-    return false;
-  };
-  if (!fixWeight()) {
-    let tries = 0;
-    const t = setInterval(() => { if (fixWeight() || ++tries > 40) clearInterval(t); }, 150);
-  }
+  registerAppFont();
 }
-
-const webBg = (css: string) => (Platform.OS === 'web' ? ({ background: css } as any) : {});
-const webTextGradient = (id: string) => Platform.OS === 'web'
-  ? ({ backgroundImage: `linear-gradient(90deg,${colors.brandStart},${colors.brandEnd})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' } as any)
-  : {};
 
 function StatusBar(_props: { dark?: boolean }) {
   return null;
 }
 
-function HomeIndicator({ theme = 'light' }: { theme?: 'light' | 'dark' }) {
-  return <View style={theme === 'dark' ? styles.homeIndicatorDark : styles.homeIndicator} />;
+function HomeIndicator(_props: { theme?: 'light' | 'dark' }) {
+  return null;
 }
 
 type PromoCard = { x: number; y: number; w: number; h: number; cover?: any };
@@ -293,10 +261,31 @@ function HostMark({ kind, size = 14 }: { kind: string; size?: number }) {
 function PopularHostMark({ kind }: { kind: string }) {
   const markSrc = kind === 'coffee' ? require('../assets/hosts/mark-codecoffee.png')
     : kind === 'commons' ? require('../assets/hosts/mark-commons.png')
+    : kind === 'builders' ? require('../assets/hosts/mark-builders.png')
+    : kind === 'studio' ? require('../assets/hosts/mark-studio.png')
     : require('../assets/hosts/mark-lantern.png');
   return <Image source={markSrc} style={{ width: 16, height: 16, borderRadius: 4, marginRight: 8, resizeMode: 'cover' } as any} />;
 }
 
+
+const WEEKDAY_TRACK: Record<string, number> = { Tuesday: 0.02, Saturday: 0.02, Monday: -0.063, Friday: 0.1, Sunday: -0.047 };
+
+function ViewAllChevron() {
+  return (
+    <View style={styles.viewAllChevron}>
+      <ChevronRight size={20} color={colors.inkMuted} />
+    </View>
+  );
+}
+
+const DATE_TRACK: Record<string, number> = { 'October 11': -0.07 };
+
+const STICKY_PLATE = 14.2;
+const STICKY_PLATE_FIRST = 10;
+function stickyPlate(first: boolean) {
+  const plate = first ? STICKY_PLATE_FIRST : STICKY_PLATE;
+  return { top: STICKY_PLATE - plate, paddingTop: plate, marginTop: (first ? 11.3 : 10.2) - plate };
+}
 
 function HomeScreen({ onOpenDetail, onScroll, onProfile }: { onOpenDetail: (id: string) => void; onScroll?: (y: number) => void; onProfile: () => void }) {
   return (
@@ -321,7 +310,7 @@ function HomeScreen({ onOpenDetail, onScroll, onProfile }: { onOpenDetail: (id: 
           <Text style={styles.sectionTitle}>Your Events</Text>
           <View style={{ flex: 1 }} />
           <Text style={styles.viewAll}>View All</Text>
-          <View style={{ marginLeft: 2.1 }}><ChevronRight size={18} color={colors.inkMuted} /></View>
+          <ViewAllChevron />
         </View>
         <View style={styles.emptyCard}>
           <Image source={require('../assets/hosts/empty-tile.png')} style={{ width: 64, height: 64, borderRadius: 15 } as any} />
@@ -342,10 +331,10 @@ function HomeScreen({ onOpenDetail, onScroll, onProfile }: { onOpenDetail: (id: 
           return (
           <View key={ev.id}>
             {showDate && (
-              <View style={[styles.dateDivider, styles.dateSticky, i > 0 && { marginTop: 10.2 }]}>
-                <Text style={styles.dateBold}>{ev.dateLabel}</Text>
+              <View style={[styles.dateDivider, styles.dateSticky, stickyPlate(i === 0)]}>
+                <Text style={[styles.dateBold, DATE_TRACK[ev.dateLabel] !== undefined && { letterSpacing: DATE_TRACK[ev.dateLabel] }]}>{ev.dateLabel}</Text>
                 <Text style={styles.dateSlash}> / </Text>
-                <Text style={styles.dateDay}>{ev.dayLabel}</Text>
+                <Text style={[styles.dateDay, { letterSpacing: WEEKDAY_TRACK[ev.dayLabel] ?? 0 }]}>{ev.dayLabel}</Text>
               </View>
             )}
             {!showDate && (
@@ -362,11 +351,13 @@ function HomeScreen({ onOpenDetail, onScroll, onProfile }: { onOpenDetail: (id: 
                 accessibilityLabel={[ev.title, ev.time, ev.location, ev.price, `By ${ev.host}`].filter(Boolean).join(', ')}
               >
                 {ev.hostKind !== 'none' && (
-                  <View style={styles.hostRow}>
+                  <View style={[styles.hostRow, ev.price ? styles.hostRowPriced : null]}>
                     <HostMark kind={ev.hostKind} size={26} />
-                    <Text style={[styles.hostName, { flexShrink: 1 }]} numberOfLines={1}>{ev.host}</Text>
+                    <Text style={[styles.hostName, { flexShrink: 1 }, ev.price ? { marginRight: 50 } : null]} numberOfLines={1}>{ev.host}</Text>
                     {ev.hostKind === 'book' && <Image source={require('../assets/hosts/books.png')} style={{ width: 15, height: 15, marginLeft: 4, resizeMode: 'contain' } as any} />}
-                    {ev.price ? <Text style={styles.priceTag}>{ev.price}</Text> : null}
+                    {ev.price ? (
+                      <View style={styles.pricePill}><Text style={styles.priceTag}>{ev.price}</Text></View>
+                    ) : null}
                     <View style={{ flex: 1 }} />
                   </View>
                 )}
@@ -414,8 +405,8 @@ function AccountAvatar({ size, style }: { size: number; style?: any }) {
 function HeaderAvatar({ onPress }: { onPress: () => void }) {
   return (
     <TouchableOpacity accessibilityRole="button" style={styles.avatarBtn} onPress={onPress} activeOpacity={0.7}>
-      <View accessibilityRole="button" accessibilityLabel="Profile" style={[styles.avatar as any, { overflow: 'hidden' }]}>
-        <AccountAvatar size={40} />
+      <View accessibilityRole="button" accessibilityLabel="Profile" style={[styles.avatar as any, { alignItems: 'center', justifyContent: 'center' }]}>
+        <AccountAvatar size={32} />
       </View>
     </TouchableOpacity>
   );
@@ -480,25 +471,18 @@ function MoreDotsIcon({ size = 24, color = '#FFFFFF' }: any) {
   );
 }
 
-const previewCovers = [
-  require('../assets/covers/cover-founders.jpg'),
-  require('../assets/covers/cover-summit.jpg'),
-  require('../assets/covers/cover-clouds.jpg'),
-];
-
-function PopularCard({ ev, cover, preview, onPress, isLast, isFirst }: { ev?: any; cover?: any; preview?: boolean; onPress?: () => void; isLast?: boolean; isFirst?: boolean }) {
+function PopularCard({ ev, cover, onPress, isLast, isFirst }: { ev: any; cover: any; onPress: () => void; isLast?: boolean; isFirst?: boolean }) {
   const coverPad = isFirst ? 18 : 9;
-  const bodyPad = isFirst ? 21 : 9;
+  const bodyPad = isFirst ? 21.4 : 8.7;
   return (
     <View style={styles.popCardWrap}>
       <TouchableOpacity
         activeOpacity={0.85}
         onPress={onPress}
         style={styles.popCard}
-        disabled={preview}
       >
         <Image source={cover} style={[styles.popCover as any, { marginTop: coverPad }]} resizeMode="cover" />
-        {!preview && ev && (
+        {ev && (
           <View
             style={[styles.popCardBody, { marginTop: bodyPad }]}
             accessibilityRole="button"
@@ -559,8 +543,8 @@ function DiscoverScreen({ onOpenDetail, onScroll, onProfile }: { onOpenDetail: (
             <Text style={[styles.discPopular, { letterSpacing: DISCOVER_TRACK.popular }]}>Popular Events</Text>
           </View>
           <View style={{ flex: 1 }} />
-          <Text style={styles.discViewAll}>View All</Text>
-          <View style={{ marginLeft: 2.1 }}><ChevronRight size={17} color={colors.inkMuted} /></View>
+          <Text style={styles.viewAll}>View All</Text>
+          <ViewAllChevron />
         </View>
 
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.popularGrid}
@@ -571,8 +555,8 @@ function DiscoverScreen({ onOpenDetail, onScroll, onProfile }: { onOpenDetail: (
             ))}
           </View>
           <View style={styles.popularColumn}>
-            {previewCovers.map((c, i) => (
-              <PopularCard key={i} preview cover={c} isFirst={i === 0} isLast={i === previewCovers.length - 1} />
+            {popularEventsNext.map((ev, i) => (
+              <PopularCard key={ev.id} ev={ev} cover={ev.cover} isFirst={i === 0} isLast={i === popularEventsNext.length - 1} onPress={() => onOpenDetail(ev.id)} />
             ))}
           </View>
         </ScrollView>
@@ -612,23 +596,6 @@ function DiscoverScreen({ onOpenDetail, onScroll, onProfile }: { onOpenDetail: (
   );
 }
 
-function TicketGlyph({ size = 20, color = '#151516' }: any) {
-  return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
-      <Path d="M4 5a2 2 0 0 0-2 2v3.2a1.8 1.8 0 0 1 0 3.6V17a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-3.2a1.8 1.8 0 0 1 0-3.6V7a2 2 0 0 0-2-2H4zm9 2h2v2h-2V7zm0 4h2v2h-2v-2zm0 4h2v2h-2v-2z" />
-    </Svg>
-  );
-}
-
-function MailGlyph({ size = 20, color = '#E8EAEE' }: any) {
-  return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.8}>
-      <Rect x="3" y="5.5" width="18" height="13" rx="2.4" />
-      <Path d="M4 7.5l8 5.6 8-5.6" />
-    </Svg>
-  );
-}
-
 const ACTION_LABEL_TRACK = { register: -0.07, contact: -0.3, more: -0.15 };
 
 const DETAIL_TITLE_PIN_Y = 472.8;
@@ -650,7 +617,7 @@ function DetailScreen({ eventId, onBack }: { eventId: string | null; onBack: () 
   return (
     <View style={[styles.detailRoot, bgCss ? ({ background: bgCss } as any) : null]}>
       <View style={styles.detailStatusWrap}><StatusBar dark /></View>
-      <View style={[styles.detailNav, pinned ? styles.detailNavPinned : null]}>
+      <View style={styles.detailNav}>
         <TouchableOpacity style={styles.detailNavBtn} accessibilityLabel="Back" onPress={onBack}>
           <BackArrow size={26} color="#fff" />
         </TouchableOpacity>
@@ -684,11 +651,11 @@ function DetailScreen({ eventId, onBack }: { eventId: string | null; onBack: () 
               <Text style={[styles.detailActionLabel, styles.detailActionLabelPrimary, { letterSpacing: ACTION_LABEL_TRACK.register }]}>Register</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.detailAction} accessibilityLabel="Contact" activeOpacity={0.8}>
-              <EnvelopeIcon size={24} color="#D1D4DD" />
+              <EnvelopeIcon size={24} color={colors.detailSoft} />
               <Text style={[styles.detailActionLabel, { letterSpacing: ACTION_LABEL_TRACK.contact }]}>Contact</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.detailAction} accessibilityLabel="More" activeOpacity={0.8} onPress={() => setSheet('more')}>
-              <MoreDotsIcon size={24} color="#D1D4DD" />
+              <MoreDotsIcon size={24} color={colors.detailSoft} />
               <Text style={[styles.detailActionLabel, { letterSpacing: ACTION_LABEL_TRACK.more }]}>More</Text>
             </TouchableOpacity>
           </View>
@@ -743,7 +710,9 @@ function DetailScreen({ eventId, onBack }: { eventId: string | null; onBack: () 
           <Text style={[styles.detailSection, styles.detailSectionAbout]}>About Event</Text>
           <View style={styles.detailDivider} />
           <View style={styles.detailAboutMedia} accessibilityRole="button">
-            <View style={styles.detailAboutImage} accessibilityRole="button" accessibilityLabel="Image" />
+            <View style={styles.detailAboutImage} accessibilityRole="button" accessibilityLabel="Image">
+              <Image source={ev.cover} style={styles.detailAboutImageFill as any} resizeMode="cover" />
+            </View>
           </View>
           <Text style={styles.detailAbout}>{ev.about}</Text>
         </View>
@@ -790,6 +759,34 @@ function DetailSheet({ kind, onClose }: { kind: DetailSheetKind; onClose: () => 
         )}
       </View>
     </View>
+  );
+}
+
+function HistoryIcon({ size = 18, color = '#A1A1A2' }: { size?: number; color?: string }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Path
+        fill={color}
+        d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"
+      />
+    </Svg>
+  );
+}
+
+function DollarIcon({ size = 18, color = '#C4C4C4' }: { size?: number; color?: string }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2.2} strokeLinecap="round">
+      <Path d="M12 2.5v19M16.8 7.2c0-1.9-2.1-3.1-4.8-3.1s-4.8 1.3-4.8 3.4c0 4.8 9.6 2.7 9.6 7.6 0 2.1-2.1 3.6-4.8 3.6s-4.8-1.4-4.8-3.3" />
+    </Svg>
+  );
+}
+
+function ClearCircleIcon({ size = 15, color = '#B7B8B9' }: { size?: number; color?: string }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Circle cx="12" cy="12" r="12" fill={color} />
+      <Path d="M8.2 8.2l7.6 7.6M15.8 8.2l-7.6 7.6" stroke="#FFFFFF" strokeWidth={2.6} strokeLinecap="round" />
+    </Svg>
   );
 }
 
@@ -945,10 +942,11 @@ function CreateScreen({ onBack }: { onBack: () => void }) {
       <ScrollView style={styles.scroll} contentContainerStyle={{ paddingBottom: 130 }} showsVerticalScrollIndicator={false}>
         {draftPrompt && (
         <View style={styles.restorePill}>
-          <View style={styles.restoreClock}><ClockIcon size={18} color={colors.inkMuted} /></View>
+          <View style={styles.restorePillFill} pointerEvents="none" />
+          <View style={styles.restoreClock}><HistoryIcon size={18} color={colors.inkMuted} /></View>
           <Text style={styles.restoreText} numberOfLines={1}>Restore draft?</Text>
           <TouchableOpacity accessibilityRole="button" style={styles.restoreClose} activeOpacity={0.7} onPress={() => setDraftPrompt(false)}>
-            <CloseX size={18} color={colors.inkMuted} />
+            <View style={styles.restoreCloseGlyph}><ClearCircleIcon size={15} /></View>
           </TouchableOpacity>
         </View>
         )}
@@ -1011,13 +1009,30 @@ function CreateScreen({ onBack }: { onBack: () => void }) {
 
         <View style={styles.ticketingDivider} />
         <Text style={styles.ticketingTitle}>Ticketing</Text>
-        <View style={styles.approvalRow}>
-          <LockIcon size={20} />
-          <Text style={styles.rowLabelApproval}>Require Approval</Text>
-          <View style={{ flex: 1 }} />
-          <TouchableOpacity onPress={() => setApproval(!approval)} activeOpacity={0.8} style={[styles.toggle, approval && styles.toggleOn]}>
-            <View style={[styles.toggleThumb, approval && styles.toggleThumbOn]} />
-          </TouchableOpacity>
+        <View style={styles.ticketCard}>
+          <View style={styles.approvalRow}>
+            <View style={styles.ticketIcon}><LockIcon size={20} color="#C4C4C4" /></View>
+            <Text style={styles.rowLabelApproval}>Require Approval</Text>
+            <View style={{ flex: 1 }} />
+            <TouchableOpacity
+              onPress={() => setApproval(!approval)}
+              activeOpacity={0.8}
+              style={[styles.toggle, approval && styles.toggleOn]}
+              accessibilityRole="switch"
+              accessibilityLabel="Require Approval"
+              aria-checked={approval}
+            >
+              <View style={[styles.toggleThumb, approval && styles.toggleThumbOn]} />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.ticketRule} />
+          <View style={styles.priceRow}>
+            <View style={styles.ticketIcon}><DollarIcon size={18} color="#C4C4C4" /></View>
+            <Text style={styles.rowLabelPrice}>Price</Text>
+            <View style={{ flex: 1 }} />
+            <Text style={styles.priceValue}>Free</Text>
+            <View style={styles.priceChevron}><ChevronRight size={18} color="#C4C4C4" /></View>
+          </View>
         </View>
       </ScrollView>
       <HomeIndicator />
@@ -1091,7 +1106,6 @@ function TabBar({ active, onChange }: { active: string; onChange: (t: string) =>
 type Screen = 'promo' | 'login' | 'email' | 'linkPhone' | 'passkey' | 'notifyOptIn' | 'main' | 'detail' | 'create' | 'profile';
 
 export default function App() {
-  const [loaded] = useAppFonts();
   const [screen, setScreen] = React.useState<Screen>('promo');
   const [tab, setTab] = React.useState('home');
   const [detailId, setDetailId] = React.useState<string | null>(null);
@@ -1145,12 +1159,6 @@ const styles = StyleSheet.create({
   screenRoot: { flex: 1, height: '100%', backgroundColor: colors.white },
   scroll: { flex: 1 },
 
-  statusBar: { position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10, pointerEvents: 'none', flexDirection: 'row', alignItems: 'center', paddingLeft: 58, paddingRight: 28, paddingTop: 12, height: 40 },
-  statusTime: { fontSize: 14, fontWeight: '400', letterSpacing: 2.2, marginRight: 8 },
-  statusIcons: { flexDirection: 'row', alignItems: 'center' },
-  homeIndicator: { width: 134, height: 5, backgroundColor: '#4A4A4D', borderRadius: 3, position: 'absolute', bottom: 14, alignSelf: 'center' },
-  homeIndicatorDark: { width: 107, height: 4, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.85)', position: 'absolute', bottom: 10, alignSelf: 'center' },
-
   promoRoot: { flex: 1, height: '100%', backgroundColor: '#FFFFFF', overflow: 'hidden' },
   promoContent: {
     flex: 1, alignItems: 'center', justifyContent: 'flex-end',
@@ -1166,7 +1174,7 @@ const styles = StyleSheet.create({
     shadowColor: '#F65991', shadowOpacity: 0.35, shadowRadius: 16, shadowOffset: { width: 0, height: 6 },
   },
   promoHint: { position: 'absolute', left: 0, right: 0, bottom: 96, zIndex: 3, textAlign: 'center', fontSize: 13.2, lineHeight: 16.4, color: '#F7F7F7' },
-  loginHint: { position: 'absolute', left: 0, right: 0, top: 200.9, zIndex: 3, textAlign: 'center', fontSize: 13.2, lineHeight: 16.4, color: '#F7F7F7' },
+  loginHint: { position: 'absolute', left: 0, right: 0, top: 201.6, zIndex: 3, textAlign: 'center', fontSize: 13.2, lineHeight: 16.4, color: '#F7F7F7' },
 
   loginCovers: { position: 'absolute', top: -49.5, left: 0, width: 393, height: 242 },
   loginTextBlock: { position: 'absolute', top: 298, left: 0, right: 0, alignItems: 'center', zIndex: 2 },
@@ -1192,35 +1200,35 @@ const styles = StyleSheet.create({
   },
   headerTitle: { fontSize: 24, fontWeight: '700', color: colors.ink },
   screenTitle: { fontSize: 21, fontWeight: '700', color: colors.ink, letterSpacing: -0.23 },
-  sparkle: { color: colors.ink, fontSize: 14, fontWeight: '700', marginTop: 0, marginLeft: 1, lineHeight: 20 },
 
   sectionHeader: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, marginTop: 8 },
-  sectionTitle: { fontSize: 19, fontWeight: '700', color: colors.ink },
-  viewAll: { fontSize: 16, color: colors.inkMuted, fontWeight: '400', flexDirection: 'row' },
+  sectionTitle: { fontSize: 19, fontWeight: '700', color: colors.ink, lineHeight: 25.1, letterSpacing: 0.07 },
+  viewAll: { fontSize: 16, color: colors.inkMuted, fontWeight: '400', flexDirection: 'row', lineHeight: 21.1, letterSpacing: 0.21, alignSelf: 'flex-start', marginTop: 3 },
   pickedTitle: { fontSize: 19, fontWeight: '700', color: colors.ink, paddingHorizontal: 16, marginTop: 24.5 },
-  popularTitle: { fontSize: 19, fontWeight: '600', color: colors.inkMuted, paddingHorizontal: 16, marginTop: 2 },
 
-  emptyCard: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, marginTop: 18, gap: 16 },
-  emptyIcon: { width: 64, height: 64, borderRadius: 15, backgroundColor: colors.emptyTile, alignItems: 'center', justifyContent: 'center' },
-  emptyTitle: { fontSize: 16, fontWeight: '500', color: colors.inkMuted },
+  viewAllChevron: { alignSelf: 'flex-start', marginTop: 3.5, marginLeft: 2.05, marginRight: -1.95 },
+
+  emptyCard: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, marginTop: 16.9, gap: 16 },
+  emptyTitle: { fontSize: 16, fontWeight: '500', color: colors.inkMuted, letterSpacing: -0.105 },
   emptyDesc: { fontSize: 14, color: colors.inkMuted, marginTop: 6.2, lineHeight: 19.45 },
 
   nearbyRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, marginTop: 3.3 },
   nearbyText: { fontSize: 19, color: colors.inkMuted, fontWeight: '500' },
 
   dateDivider: { flexDirection: 'row', alignItems: 'baseline', paddingHorizontal: 16, marginTop: 11.3 },
-  dateSticky: { position: 'sticky', top: 14.2, zIndex: 5, backgroundColor: colors.white } as any,
+  dateSticky: { position: 'sticky', zIndex: 5, backgroundColor: colors.white } as any,
   dateBold: { fontSize: 16, fontWeight: '600', color: colors.ink, letterSpacing: -0.16 },
-  dateSlash: { fontSize: 16, color: colors.inkMuted, marginRight: 6 },
-  dateDay: { fontSize: 16, color: colors.inkMuted, letterSpacing: -0.68, paddingRight: 4.8 },
+  dateSlash: { fontSize: 16, color: colors.inkMuted, marginRight: 5.5 },
+  dateDay: { fontSize: 16, color: colors.inkMuted },
 
   feedRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, marginTop: 10.3, paddingBottom: 16 },
   feedCover: { width: 80, height: 80, borderRadius: 12, backgroundColor: '#E8E8EC', alignSelf: 'flex-start' },
   feedBody: { flex: 1, marginLeft: 12.1, justifyContent: 'flex-start' },
   hostRow: { flexDirection: 'row', alignItems: 'center', minHeight: 16, marginTop: 3, marginBottom: 2.9 },
-  hostDot: { width: 16, height: 16, borderRadius: 8, marginRight: 7 },
+  hostRowPriced: { minHeight: 18.2, marginTop: 0, marginBottom: 8.4 },
   hostName: { fontSize: 12, color: colors.inkSecondary, fontWeight: '400' },
-  priceTag: { fontSize: 13, fontWeight: '700', color: '#16A34A', backgroundColor: '#DCFCE7', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8, overflow: 'hidden' },
+  pricePill: { position: 'absolute', right: 0, top: 0, height: 18.2, paddingHorizontal: 5.6, borderRadius: 6, backgroundColor: '#F5FCF4', justifyContent: 'center' },
+  priceTag: { fontSize: 10.5, lineHeight: 13, fontWeight: '600', color: '#3CBD2C' },
   feedTitle: { fontSize: 16, fontWeight: '600', color: colors.ink, lineHeight: 23.3, marginBottom: 0 },
   metaRow: { flexDirection: 'row', alignItems: 'center', marginTop: 9.6 },
   metaText: { fontSize: 14, color: colors.inkSecondary, marginLeft: 6 },
@@ -1229,24 +1237,23 @@ const styles = StyleSheet.create({
   discCityRow: { flexDirection: 'row', alignItems: 'flex-start', paddingHorizontal: 16, marginTop: 8 },
   discCity: { fontSize: 19, fontWeight: '700', color: colors.ink, lineHeight: 25 },
   discPopular: { fontSize: 19, fontWeight: '500', color: colors.inkMuted, lineHeight: 25, marginTop: 2.35 },
-  discViewAll: { fontSize: 16, color: colors.inkMuted, marginTop: 3 },
 
-  popularGrid: { marginTop: 15.45 },
+  popularGrid: { marginTop: 15.65 },
   popularColumn: { width: 343.5 },
-  popCardWrap: { width: 343.5, height: 133 },
-  popCard: { height: 116, width: 343.5, flexDirection: 'row', paddingLeft: 16 },
+  popCardWrap: { width: 343.5, height: 132.8 },
+  popCard: { height: 116.1, width: 343.5, flexDirection: 'row', paddingLeft: 16 },
   popHairline: { position: 'absolute', left: 92, right: 4, top: 124, height: 1, backgroundColor: '#F0F0F1' },
   popCover: { width: 80, height: 80, borderRadius: 12, marginLeft: 0, marginTop: 9, backgroundColor: '#E8E8EC' },
-  popCardBody: { marginLeft: 12, marginTop: 9, width: 231.4 },
-  popHostRow: { flexDirection: 'row', alignItems: 'center', height: 22 },
+  popCardBody: { marginLeft: 12.1, marginTop: 9, width: 231.4, alignSelf: 'flex-start' },
+  popHostRow: { flexDirection: 'row', alignItems: 'center', minHeight: 16 },
   popHost: { fontSize: 13, color: colors.inkSecondary, fontWeight: '400' },
-  popTitle: { fontSize: 15, fontWeight: '500', color: colors.ink, lineHeight: 21, marginTop: 9 },
-  popTimeRow: { flexDirection: 'row', alignItems: 'center', marginTop: 10 },
-  popTime: { fontSize: 15, color: colors.inkMuted, marginLeft: 8 },
-  badge: { paddingHorizontal: 9, paddingVertical: 0, height: 11, borderRadius: 8, marginLeft: 7, alignItems: 'center', justifyContent: 'center' },
-  badgeText: { fontSize: 11, fontWeight: '600', lineHeight: 12.5, marginTop: 0 },
+  popTitle: { fontSize: 16, fontWeight: '500', color: colors.ink, lineHeight: 23.7, marginTop: 6.1 },
+  popTimeRow: { flexDirection: 'row', alignItems: 'center', marginTop: 6.7 },
+  popTime: { fontSize: 15, color: colors.inkMuted, marginLeft: 8, lineHeight: 21 },
+  badge: { paddingHorizontal: 5.85, height: 18.2, borderRadius: 6, marginLeft: 7, marginBottom: -0.8, alignItems: 'center', justifyContent: 'center' },
+  badgeText: { fontSize: 11, fontWeight: '500', lineHeight: 14 },
 
-  browseTitle: { fontSize: 19, fontWeight: '700', color: colors.ink, paddingHorizontal: 16, marginTop: 22 },
+  browseTitle: { fontSize: 19, fontWeight: '700', color: colors.ink, paddingHorizontal: 16, marginTop: 22.4 },
   catRow: { marginTop: 13 },
   catRow2: { marginTop: 0.4 },
   catChip: { flexDirection: 'row', alignItems: 'center', paddingLeft: 11.2, paddingRight: 12.1, height: 48, borderWidth: 1, borderColor: '#F0F0F1', borderRadius: 15, gap: 8, backgroundColor: colors.white },
@@ -1273,13 +1280,10 @@ const styles = StyleSheet.create({
   sheetRule: { height: 1, backgroundColor: colors.divider },
   detailStatusWrap: { position: 'absolute' as const, top: 0, left: 0, right: 0, zIndex: 11 },
   detailNav: { position: 'absolute' as const, top: 0, left: 0, right: 0, zIndex: 10, flexDirection: 'row', justifyContent: 'space-between', paddingLeft: 8, paddingRight: 12, paddingTop: 4, paddingBottom: 8 },
-  detailNavPinned: { backgroundColor: 'rgba(16,14,30,0.72)', ...(Platform.OS === 'web' ? ({ backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)' } as any) : {}) },
   detailNavBtn: { width: 48, height: 48, borderRadius: 24, backgroundColor: 'rgba(255,255,255,0.08)', alignItems: 'center', justifyContent: 'center' },
   detailScroll: { position: 'absolute' as const, top: 64, left: 0, right: 0, bottom: 0, overflow: 'hidden' as const },
   detailCoverWrap: { marginHorizontal: 16, marginTop: 1, borderRadius: 22, overflow: 'hidden' as const },
   detailCover: { width: '100%', height: 393, backgroundColor: '#1a1a2e' },
-  featuredBar: { backgroundColor: 'rgba(0,0,0,0.5)', paddingVertical: 10, alignItems: 'center' },
-  featuredText: { color: '#fff', fontSize: 14, fontWeight: '500' },
   detailBody: { paddingHorizontal: 16, marginTop: 14.95 },
   detailTitle: { fontSize: 27, fontWeight: '600', color: colors.detailText, lineHeight: 32 },
   detailHostRow: { flexDirection: 'row', alignItems: 'center', minHeight: 16, marginTop: 13.3 },
@@ -1291,18 +1295,18 @@ const styles = StyleSheet.create({
     flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingTop: 7.5, gap: 0.85,
   },
   detailActionPrimary: { backgroundColor: '#FFFFFF' },
-  detailActionLabel: { color: '#D1D4DD', fontSize: 12, fontWeight: '500', textAlign: 'center' },
+  detailActionLabel: { color: colors.detailSoft, fontSize: 12, fontWeight: '500', textAlign: 'center' },
   detailActionLabelPrimary: { color: '#000000' },
-  detailSection: { fontSize: 16, fontWeight: '600', color: colors.detailMuted, marginTop: 0 },
-  detailSectionFirst: { marginTop: 23.05 },
-  detailSectionInline: { fontSize: 16, fontWeight: '600', color: colors.detailMuted },
-  detailSectionGoing: { marginTop: 23.3 },
-  detailSectionAbout: { marginTop: 21.6 },
-  detailDivider: { height: 1, backgroundColor: 'rgba(255,255,255,0.15)', marginTop: 13, marginBottom: 0 },
+  detailSection: { fontSize: 16, fontWeight: '500', color: colors.detailMuted, marginTop: 0, lineHeight: 18.9 },
+  detailSectionFirst: { marginTop: 24.15 },
+  detailSectionInline: { fontSize: 16, fontWeight: '500', color: colors.detailMuted, lineHeight: 18.9, flex: 1, marginRight: 8 },
+  detailSectionGoing: { marginTop: 24.4 },
+  detailSectionAbout: { marginTop: 22.7 },
+  detailDivider: { height: 1, backgroundColor: 'rgba(255,255,255,0.15)', marginTop: 14, marginBottom: 0 },
   detailLocation: { fontSize: 20, fontWeight: '500', color: colors.detailText, lineHeight: 24, marginTop: 4.8 },
   detailAddress: { fontSize: 16, color: colors.detailMuted, marginTop: 1.8, lineHeight: 19.45 },
   detailFeatured: { position: 'absolute' as const, left: 0, right: 0, bottom: 0, height: 34, backgroundColor: 'rgba(6,10,24,0.72)', alignItems: 'center', justifyContent: 'center' },
-  detailFeaturedText: { color: '#CCCED4', fontSize: 12, fontWeight: '500' },
+  detailFeaturedText: { color: colors.detailSoft, fontSize: 12, fontWeight: '500' },
   detailPinnedTitle: { flex: 1, alignSelf: 'center', color: colors.detailText, fontSize: 18, fontWeight: '600', marginHorizontal: 8 },
   detailMap: { marginTop: 12.25, height: 120.1, borderRadius: 14, backgroundColor: '#EAE6DC', overflow: 'hidden' as const },
   mapBlock: { position: 'absolute' as const, backgroundColor: '#F4F0E6', borderRadius: 3 },
@@ -1313,7 +1317,7 @@ const styles = StyleSheet.create({
   mapPinTip: { width: 0, height: 0, borderLeftWidth: 6, borderRightWidth: 6, borderTopWidth: 9, borderLeftColor: 'transparent', borderRightColor: 'transparent', borderTopColor: '#EA4335', marginTop: -2 },
   mapLabel: { position: 'absolute' as const, left: 10, top: 12, color: '#5C6068', fontSize: 12, fontWeight: '500', lineHeight: 15 },
   detailHostHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 11.65 },
-  detailHostContact: { fontSize: 13.5, color: '#B4B5B9', fontWeight: '500' },
+  detailHostContact: { fontSize: 13.5, color: colors.detailMuted, fontWeight: '500' },
   detailHostContactBtn: { width: 54.2, height: 48, alignItems: 'center', justifyContent: 'center' },
   detailDividerTight: { height: 1, backgroundColor: 'rgba(255,255,255,0.15)', marginTop: 5 },
   detailSpeakerRow: { flexDirection: 'row', alignItems: 'flex-start', marginTop: 2.75 },
@@ -1325,8 +1329,9 @@ const styles = StyleSheet.create({
   goingAvatar: { width: 28, height: 28, borderRadius: 14, borderWidth: 2, borderColor: colors.detailBg, alignItems: 'center', justifyContent: 'center' },
   goingAvatarOverlap: { marginLeft: -10 },
   goingAvatarInitial: { color: '#FFFFFF', fontSize: 11, fontWeight: '700', letterSpacing: 0.2 },
-  detailAboutMedia: { marginHorizontal: -16, marginTop: 5.75, height: 75.3, backgroundColor: '#0B1220' },
-  detailAboutImage: { marginLeft: 16, marginTop: 17.1, width: 361.3, height: 58.2, backgroundColor: '#131C2E', borderRadius: 12 },
+  detailAboutMedia: { marginHorizontal: -16, marginTop: 5.75, height: 75.3 },
+  detailAboutImage: { marginLeft: 16, marginTop: 17.1, width: 361.3, height: 58.2, backgroundColor: '#131C2E', borderRadius: 12, overflow: 'hidden' },
+  detailAboutImageFill: { width: '100%', height: 240 },
   detailAbout: { fontSize: 15, color: colors.detailText, marginTop: 12, lineHeight: 21 },
 
   galleryRoot: { flex: 1, height: '100%', backgroundColor: colors.white },
@@ -1339,11 +1344,11 @@ const styles = StyleSheet.create({
   galleryCatLabel: { fontSize: 14, color: '#C4C4C5', marginTop: 21.6, fontWeight: '500' },
   galleryCatActive: { color: colors.ink, fontWeight: '600' },
   galleryCatUnderline: { position: 'absolute' as const, bottom: -1, left: 12, right: 12, height: 2.5, backgroundColor: colors.ink },
-  galleryScrollbar: { position: 'absolute' as const, right: 0, top: 56, width: 2.2, height: 67.3, backgroundColor: '#FFFFFF' },
+  galleryScrollbar: { position: 'absolute' as const, right: 0, top: 56, width: 2.2, height: 67.3, backgroundColor: 'transparent' },
   galleryScroll: { flex: 1, marginBottom: 77.2 },
   galleryHero: { marginTop: 12.1, height: 204.5, borderRadius: 20, backgroundColor: '#FF9500', overflow: 'hidden' as const },
-  galleryHeroTitle: { position: 'absolute' as const, left: 16, top: 16, fontSize: 16, fontWeight: '600', color: '#FFFFFF' },
-  galleryHeroCount: { position: 'absolute' as const, left: 16, top: 41, fontSize: 12.2, color: 'rgba(255,255,255,0.92)' },
+  galleryHeroTitle: { position: 'absolute' as const, left: 16, top: 16, fontSize: 16, fontWeight: '500', color: '#FFFFFF', letterSpacing: -0.38 },
+  galleryHeroCount: { position: 'absolute' as const, left: 16, top: 41, fontSize: 12.2, color: 'rgba(255,255,255,0.8)' },
   galleryHeroCardA: { position: 'absolute' as const, right: 78, top: 42, width: 140, height: 162, borderRadius: 12, transform: [{ rotate: '-8deg' }] },
   galleryHeroCardB: { position: 'absolute' as const, right: 10, top: 30, width: 124, height: 140, borderRadius: 12, transform: [{ rotate: '6deg' }] },
   galleryGrid: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 16, columnGap: 16, rowGap: 26.2 },
@@ -1352,14 +1357,13 @@ const styles = StyleSheet.create({
   galleryTileLabelWrap: { backgroundColor: '#FFFFFF', height: 47.9, alignItems: 'center', justifyContent: 'center' },
   galleryTileLabel: { fontSize: 15, color: colors.ink },
   galleryFooter: { position: 'absolute' as const, left: 16, right: 16, bottom: 15, height: 50.2, justifyContent: 'center' },
-  galleryChooseBtn: { flex: 1, paddingHorizontal: 12, backgroundColor: '#2E2E30', borderRadius: 25, alignItems: 'center', justifyContent: 'center' },
+  galleryChooseBtn: { flex: 1, paddingHorizontal: 12, backgroundColor: colors.btnBlack, borderRadius: 25, alignItems: 'center', justifyContent: 'center' },
   galleryChooseText: { width: '100%', textAlign: 'center', color: '#FFFFFF', fontSize: 16, fontWeight: '500' },
   skelHero: { backgroundColor: '#F6F6F6' },
   skelBar: { position: 'absolute' as const, backgroundColor: '#EDEDED', borderRadius: 3 },
   skelTile: { backgroundColor: '#F6F6F6', height: 172.5 },
   skelTileImg: { height: 124.9, backgroundColor: '#D6D6D6' },
   coverChosen: { position: 'absolute' as const, left: 0, top: 0, width: '100%', height: '100%', borderRadius: 12 },
-  coverChangeText: { fontSize: 13, color: colors.inkMuted, marginTop: 6, alignSelf: 'center' },
 
   createRoot: { flex: 1, height: '100%', backgroundColor: '#F6F7F8' },
   iconBtn48: { width: 48, height: 48, alignItems: 'center', justifyContent: 'center' },
@@ -1367,17 +1371,19 @@ const styles = StyleSheet.create({
   createTitle: { fontSize: 19, fontWeight: '500', color: colors.ink, width: 116.1, letterSpacing: -0.13 },
   createAvatarGroup: { width: 54.2, height: 48, flexDirection: 'row', alignItems: 'center' },
   createAvatarTarget: { position: 'absolute' as const, left: 0, top: 9.8, width: 28, height: 28 },
-  restorePill: { alignSelf: 'center', flexDirection: 'row', alignItems: 'flex-start', backgroundColor: '#EDEEEF', borderRadius: 20.75, width: 168.8, height: 41.5, paddingLeft: 12 },
-  restoreClock: { marginTop: 11.75 },
-  restoreText: { fontSize: 14, color: '#969798', marginLeft: 4, marginTop: 8, lineHeight: 18.9, flexShrink: 0 },
+  restorePill: { alignSelf: 'center', flexDirection: 'row', alignItems: 'flex-start', width: 168.8, height: 41.5, paddingLeft: 12 },
+  restorePillFill: { position: 'absolute', left: 0, right: 0, top: 0, height: 35, borderRadius: 17.5, backgroundColor: '#EDEEEF' },
+  restoreClock: { marginTop: 8.35, marginLeft: -0.7 },
+  restoreText: { fontSize: 14.5, fontWeight: '500', letterSpacing: 0.05, color: '#969798', marginLeft: 4.7, marginTop: 8, lineHeight: 18.9, flexShrink: 0 },
   restoreClose: { position: 'absolute', left: 126.6, top: 0, width: 48, height: 41.5, alignItems: 'center', justifyContent: 'center' },
+  restoreCloseGlyph: { marginTop: -6.5, marginLeft: 0.6 },
   coverUpload: { width: 240.5, height: 240.5, alignSelf: 'center', backgroundColor: '#EDEEEF', borderRadius: 12, marginTop: 5.5 },
   coverUploadBtn: {
     position: 'absolute', right: 4, bottom: 4, width: 48, height: 48, borderRadius: 24,
     backgroundColor: 'transparent', alignItems: 'center', justifyContent: 'center',
   },
   inputField: { width: 361, height: 58.6, alignSelf: 'center', backgroundColor: '#fff', borderRadius: 26, justifyContent: 'center', paddingLeft: 16, marginTop: 30.2 },
-  eventNameHint: { fontSize: 21, fontWeight: '500', color: '#C4C4C5', width: 119.7 },
+  eventNameHint: { fontSize: 21, fontWeight: '500', color: '#C4C4C5', width: 119.7, letterSpacing: -0.07 },
   eventNameInput: {
     position: 'absolute', left: 16, right: 16, top: 0, bottom: 0, fontSize: 21, fontWeight: '500', color: colors.ink,
     ...(Platform.OS === 'web' ? ({ outlineStyle: 'none' } as object) : {}),
@@ -1401,14 +1407,21 @@ const styles = StyleSheet.create({
   rowCardTall: { width: 361, height: 52, alignSelf: 'center', backgroundColor: '#fff', borderRadius: 26, flexDirection: 'row', alignItems: 'center', paddingLeft: 16, marginTop: 10.5 },
   rowLabelLocation: { fontSize: 15.5, color: '#A1A1A2', width: 128.8, marginLeft: 6, fontWeight: '500' },
   rowLabelDesc: { fontSize: 15.5, color: '#A1A1A2', width: 122.3, marginLeft: 6, fontWeight: '500' },
-  rowLabelApproval: { fontSize: 15.5, color: '#A1A1A2', width: 130.3, marginLeft: 8, fontWeight: '500' },
+  rowLabelApproval: { fontSize: 15.5, color: '#A1A1A2', width: 130.3, marginLeft: 9.5, fontWeight: '500' },
   ticketingDivider: { height: 1, backgroundColor: '#E5E6E7', marginTop: 24.8, marginHorizontal: 16 },
   ticketingTitle: { fontSize: 14, fontWeight: '600', color: '#9C9C9E', width: 64.4, marginTop: 19, marginLeft: 16, lineHeight: 18.9 },
-  approvalRow: { width: 361, height: 52, alignSelf: 'center', backgroundColor: '#fff', borderRadius: 22, flexDirection: 'row', alignItems: 'center', paddingLeft: 16, paddingRight: 16, marginTop: 11.2 },
-  toggle: { width: 54, height: 32, borderRadius: 16, backgroundColor: '#D6D6DB', justifyContent: 'center', paddingHorizontal: 3 },
-  toggleOn: { backgroundColor: '#1A1A1A' },
-  toggleThumb: { width: 26, height: 26, borderRadius: 13, backgroundColor: '#fff' },
-  toggleThumbOn: { alignSelf: 'flex-end' },
+  ticketCard: { width: 361, alignSelf: 'center', backgroundColor: '#fff', borderRadius: 22, marginTop: 11.2, overflow: 'hidden' },
+  approvalRow: { height: 52, flexDirection: 'row', alignItems: 'center', paddingLeft: 16, paddingRight: 16 },
+  ticketRule: { height: 0.73, marginLeft: 44, backgroundColor: colors.divider },
+  priceRow: { height: 50.2, flexDirection: 'row', alignItems: 'center', paddingLeft: 16, paddingRight: 14.5 },
+  ticketIcon: { width: 20, marginLeft: -1.5, alignItems: 'center' },
+  rowLabelPrice: { fontSize: 15.5, color: '#A1A1A2', marginLeft: 9.5, fontWeight: '500' },
+  priceValue: { fontSize: 15.5, color: '#151516', fontWeight: '500' },
+  priceChevron: { marginLeft: 6.9 },
+  toggle: { width: 52, height: 32, borderRadius: 16, borderWidth: 2, borderColor: '#B6B7B8', backgroundColor: '#ECEDEE', justifyContent: 'center', paddingHorizontal: 6 },
+  toggleOn: { backgroundColor: '#1A1A1A', borderColor: '#1A1A1A', paddingHorizontal: 2 },
+  toggleThumb: { width: 16, height: 16, borderRadius: 8, backgroundColor: '#969698' },
+  toggleThumbOn: { alignSelf: 'flex-end', width: 24, height: 24, borderRadius: 12, backgroundColor: '#FFFFFF' },
 
   emptyStateWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 30, paddingBottom: 34 },
   notifIllustration: { width: 250, height: 196 },
@@ -1426,9 +1439,9 @@ const styles = StyleSheet.create({
     position: 'absolute', top: 25, left: 0, right: 0, bottom: 0, backgroundColor: colors.tabBar,
   },
   tabItem: { position: 'absolute', top: 0, bottom: 0, alignItems: 'center', justifyContent: 'flex-start', paddingTop: 0 },
-  tabIconWrap: { width: 56, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 16, marginTop: 20 },
+  tabIconWrap: { width: 56, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 16, marginTop: 29.7 },
   tabPillActive: { backgroundColor: colors.tabPill },
-  tabLabel: { fontSize: 12, marginTop: 13.7, fontWeight: TAB_LABEL_WEIGHT },
+  tabLabel: { fontSize: 12, marginTop: 4.0, fontWeight: TAB_LABEL_WEIGHT },
   createFab: {
     position: 'absolute', right: 16, bottom: 79, flexDirection: 'row', alignItems: 'center',
     backgroundColor: colors.fab, borderRadius: 28, paddingHorizontal: 16, paddingVertical: 16,

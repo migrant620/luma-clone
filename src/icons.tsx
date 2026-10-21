@@ -133,12 +133,6 @@ export const PlusIcon = ({ size = 24, color = '#6B6B70' }: any) => (
   </Svg>
 );
 
-export const CloseX = ({ size = 20, color = '#9B9BA0' }: any) => (
-  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2.2} strokeLinecap="round">
-    <Path d="M6 6l12 12M18 6L6 18" />
-  </Svg>
-);
-
 export const CalendarEmptyIcon = ({ size = 48, color = '#E9E9EC' }: any) => (
   <Svg width={size} height={size} viewBox="0 0 160 120">
     <G>

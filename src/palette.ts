@@ -90,24 +90,26 @@ function dominantColour(img: HTMLImageElement): RGB | null {
 }
 
 function backgroundGradient(dominant: RGB): string {
-  const grey = desat(dominant, 0.72);
+  const l = Math.max(luma(dominant), 1);
+  const light = shade(desat(dominant, 0.95), 72 / l);
+  const deep = shade(dominant, 0.42);
+  const mid = shade(dominant, 0.3);
   const stops: Array<[number, RGB]> = [
-    [0.0, shade(dominant, 0.13)],
-    [0.16, shade(dominant, 0.14)],
-    [0.3, shade(dominant, 0.34)],
-    [0.46, shade(dominant, 0.46)],
-    [0.6, mix(shade(dominant, 0.55), shade(grey, 0.58), 0.5)],
-    [0.78, shade(grey, 0.66)],
-    [1.0, shade(grey, 0.74)],
+    [0.0, deep],
+    [0.35, mid],
+    [0.54, mix(mid, light, 0.2)],
+    [0.67, mix(mid, light, 0.55)],
+    [0.8, mix(mid, light, 0.88)],
+    [0.92, light],
+    [1.0, light],
   ];
   const body = `linear-gradient(180deg, ${stops
-    .map(([p, c]) => `${rgbCss(c)} ${Math.round(p * 100)}%`)
+    .map(([p, c]) => `${rgbCss(c)} ${Math.round(p * 1000) / 10}%`)
     .join(', ')})`;
-  const scrim = `linear-gradient(90deg, ${rgbCss(shade(dominant, 0.08), 0.42)} 0%, ${rgbCss(
-    shade(dominant, 0.08),
-    0,
-  )} 42%)`;
-  return `${scrim}, ${body}`;
+  const glow = `radial-gradient(ellipse 110% 48% at 0% 42%, ${rgbCss(dominant)} 0%, ${rgbCss(dominant, 0.55)} 45%, ${rgbCss(dominant, 0)} 100%)`;
+  const pool = shade(desat(dominant, 0.5), 0.6);
+  const corner = `radial-gradient(ellipse 45% 55% at 0% 100%, ${rgbCss(pool, 0.75)} 0%, ${rgbCss(pool, 0)} 100%)`;
+  return `${glow}, ${corner}, ${body}`;
 }
 
 async function extract(uri: string): Promise<CoverPalette | null> {

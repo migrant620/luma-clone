@@ -84,7 +84,7 @@ The static output is written to `dist/`. Serve that directory over HTTP or HTTPS
 
 ## Demo build
 
-The published demo at <https://migrant620.github.io/luma/> is built from this repository. It was last rebuilt and redeployed on 2026-10-20 (GitHub Pages commit `49f0086f`).
+The published demo at <https://migrant620.github.io/luma/> is built from this repository. It was last rebuilt and redeployed on 2026-10-21 (GitHub Pages commit `c18d4d82`).
 
 ## Scope and limitations
 

@@ -49,7 +49,8 @@ export const colors = {
   detailBg: '#090720',
   detailCard: '#1E2230',
   detailText: '#FFFFFF',
-  detailMuted: '#AEB0B5',
+  detailMuted: 'rgba(255,255,255,0.6)',
+  detailSoft: 'rgba(255,255,255,0.8)',
 } as const;
 
 export const fonts = {
