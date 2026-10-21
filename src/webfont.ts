@@ -2,7 +2,7 @@ import { Platform } from 'react-native';
 
 
 const FACE_ID = 'luma-face-plus-jakarta';
-const FONT_URL: unknown = require('../assets/fonts/PlusJakartaSans-VF.ttf');
+const FONT_URL: unknown = require('../assets/fonts/PlusJakartaSans-VF-latin.ttf');
 
 function fontUrl(): string | null {
   if (typeof FONT_URL === 'string') return FONT_URL;

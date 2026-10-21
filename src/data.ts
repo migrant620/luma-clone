@@ -195,7 +195,7 @@ export const categories = [
   { id: 'family', label: 'Family', icon: 'family', track: -0.10 },
   { id: 'tech', label: 'Tech', icon: 'tech', track: 0.10 },
   { id: 'food', label: 'Food & Drink', icon: 'food', track: -0.12 },
-  { id: 'music', label: 'Music', icon: 'books', track: -0.50 },
+  { id: 'music', label: 'Music', icon: 'music', track: -0.50 },
   { id: 'books', label: 'Books', icon: 'books', track: -0.47 },
   { id: 'games', label: 'Games', icon: 'games', track: -0.47 },
   { id: 'ai', label: 'AI', icon: 'ai', track: 0.30 },
@@ -215,6 +215,11 @@ export interface DetailEvent {
   going: number;
   goingNames: string;
   about: string;
+  spotsLeft?: number;
+  accessCode?: boolean;
+  gated?: { area: string; weather: string; temp: string };
+  agenda?: string[];
+  aboutImage?: boolean;
 }
 
 const mark = {
@@ -236,7 +241,7 @@ export const detailEvents: Record<string, DetailEvent> = {
   choir: { cover: require('../assets/covers/cover-choir.jpg'), title: 'Harbor Voices Choir: Second Anniversary Concert', host: 'Harbor Voices, June Morrow', hostMark: mark.lantern, time: 'Sun, Oct 11, 4:00 – 6:00 PM', location: 'Valley Hall', address: '28 Valley Road, Hillside, Lumen Bay, CA 94019, USA', speaker: 'June Morrow', speakerRole: 'Music director, Harbor Voices', going: 164, goingNames: 'Ruth Evans, Caleb North, Mia Torres, Abe Lowe, and 160 more', about: 'Two years of singing together, celebrated in one concert: folk arrangements, a cappella pop and a sing-along finale.' },
   swap: { cover: require('../assets/covers/cover-swap.jpg'), title: 'Plant & Book Swap', host: 'Neighborhood Swap Club', hostMark: mark.readpark, time: 'Mon, Oct 12, 1:00 – 3:00 PM', location: 'Maple Commons', address: 'Maple Commons, 40 Maple Street, Lumen Bay, CA 94013, USA', speaker: 'Pia Lund', speakerRole: 'Swap club volunteer', going: 58, goingNames: 'Noah Kerr, Lily Chase, Ezra Bloom, Jade Price, and 54 more', about: 'Bring cuttings, seedlings or books you are done with and leave with something new. Tea and labels provided.' },
   lanterns: { cover: require('../assets/covers/cover-lanterns.jpg'), title: 'Night Market Social', host: 'Lantern Market', hostMark: mark.lantern, time: 'Tomorrow, 11:00 AM – 9:00 PM', location: 'Lantern Square', address: 'Lantern Square, 300 Market Street, Lumen Bay, CA 94010, USA', speaker: 'Rin Okafor', speakerRole: 'Market organiser', going: 312, goingNames: 'Cara Doyle, Ivan Petrov, May Lin, Hugo Laurent, and 308 more', about: 'Street food stalls, live music and hand-made goods under strings of paper lanterns, from late morning until the last stall closes.' },
-  fireside: { cover: require('../assets/covers/cover-fireside.jpg'), title: 'Fireside: How Robots Learn to Drive', host: 'Commons Lab', hostMark: mark.commons, time: 'Mon, 2:30 – 4:00 PM', location: 'Commons Lab', address: '77 Foundry Street, Mill District, Lumen Bay, CA 94014, USA', speaker: 'Theo Marlow', speakerRole: 'Robotics researcher', going: 241, goingNames: 'Asha Patel, Lars Berg, Nora Quinn, Dev Shah, and 237 more', about: 'A relaxed conversation about simulation, sensors and the long tail of real roads, followed by open questions from the room.' },
+  fireside: { cover: require('../assets/covers/cover-fireside.jpg'), title: 'Fireside: How Robots Learn to Drive', host: 'Commons Lab', hostMark: mark.commons, time: 'Mon, 2:30 – 4:00 PM', location: 'Commons Lab', address: '77 Foundry Street, Mill District, Lumen Bay, CA 94014, USA', speaker: 'Theo Marlow', speakerRole: 'Robotics researcher', going: 241, goingNames: 'Asha Patel, Lars Berg, Nora Quinn, Dev Shah, and 237 more', about: 'Commons Lab is delighted to host a conversation about simulation, sensors and the long tail of real roads, followed by open questions from the room.', spotsLeft: 4, accessCode: true, gated: { area: 'Mill District, Lumen Bay', weather: 'Cloudy', temp: '67°F' }, agenda: ['2:30pm: Doors Open', '3:00-4:00pm: Fireside Chat'], aboutImage: false },
   founders: { cover: require('../assets/covers/cover-founders.jpg'), title: 'Fall Founders Showcase', host: 'Northstar Studio', hostMark: mark.studio, time: 'Wed, 5:00 – 7:30 PM', location: 'Northstar Studio', address: '18 Beacon Street, Mill District, Lumen Bay, CA 94014, USA', speaker: 'Noor Haddad', speakerRole: 'Partner, Northstar Studio', going: 128, goingNames: 'Ari Cohen, Bea Lim, Cole Rhodes, Dina Park, and 124 more', about: 'Eight early teams demo what they shipped this season, five minutes each, then a social hour with the founders and the studio team.' },
   clouds: { cover: require('../assets/covers/cover-clouds.jpg'), title: 'Above the Clouds Rooftop Mixer', host: 'Skyline Socials', hostMark: mark.lantern, time: 'Thu, 7:00 – 10:00 PM', location: 'Skyline Terrace', address: '220 Summit Avenue, Rooftop, Lumen Bay, CA 94010, USA', speaker: 'Maya Lorne', speakerRole: 'Host, Skyline Socials', going: 205, goingNames: 'Eve Grant, Finn Ash, Gia Moreau, Hal Burke, and 201 more', about: 'An evening mixer on the terrace: city views, a small bar and a playlist that starts quiet and does not stay that way.' },
   codecoffee: { cover: require('../assets/covers/cover-codecoffee.jpg'), title: 'Code & Coffee Community Meetup', host: 'Code & Coffee', hostMark: mark.codecoffee, time: 'Tue, 6:00 – 8:00 PM', location: 'The Roastery', address: '5 Bean Street, Old Town, Lumen Bay, CA 94011, USA', speaker: 'Sasha Kim', speakerRole: 'Community host, Code & Coffee', going: 180, goingNames: 'Will Hart, Ines Duarte, Kofi Mensah, Ella Ward, and 176 more', about: 'Bring a laptop and whatever you are building. Short show-and-tell at seven, otherwise just good coffee and better company.' },

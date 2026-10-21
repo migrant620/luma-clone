@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Platform } from 'react-native';
 import Svg, { Path, Rect, Circle } from 'react-native-svg';
 import { colors } from '../tokens';
 import { BackArrow, LockIcon, SparkleIcon, ChevronDown } from '../icons';
@@ -20,6 +20,8 @@ const ONB = {
   devices: '#F8712B',
   chevronDisc: '#EFF0F0',
   phoneShell: '#EBEBED',
+  label: '#A1A1A2',
+  hint: '#BDBDBE',
 } as const;
 
 const DISC_CX = 196.5;
@@ -213,6 +215,76 @@ export function PasskeyPromptScreen({ onNext }: { onNext: () => void }) {
   );
 }
 
+const SPARKLE_COLS = [4.4, 46.9, 88.8, 130.9, 172.5, 218.9, 260.8, 302.8, 344.6, 384.3];
+const SPARKLE_ROWS = [10.7, 52.2, 93.9, 135.5];
+const SPARKLE = 21;
+
+function SparkleBand() {
+  return (
+    <View style={styles.sparkleBand} pointerEvents="none" {...({ 'aria-hidden': true } as object)}>
+      {SPARKLE_ROWS.map((cy) => SPARKLE_COLS.map((cx) => (
+        <View key={`${cx}-${cy}`} style={[styles.sparkle, { left: cx - SPARKLE / 2, top: cy - SPARKLE / 2 }]}>
+          <SparkleIcon size={SPARKLE} color="rgba(0,0,0,0.072)" />
+        </View>
+      )))}
+      <View style={styles.sparkleFade} />
+    </View>
+  );
+}
+
+function CameraGlyph({ size = 14, color = colors.ink }: { size?: number; color?: string }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Path fill={color} d="M8.6 4.5h6.8l1.6 2.3h2.8A2.7 2.7 0 0 1 22.5 9.5v8.3a2.7 2.7 0 0 1-2.7 2.7H4.2a2.7 2.7 0 0 1-2.7-2.7V9.5a2.7 2.7 0 0 1 2.7-2.7H7z" />
+      <Circle cx="12" cy="13.4" r="4" fill="#FFFFFF" />
+      <Circle cx="12" cy="13.4" r="2.4" fill={color} />
+    </Svg>
+  );
+}
+
+interface ProfileSetupProps {
+  name: string;
+  avatar: React.ReactNode;
+  onNext: () => void;
+}
+
+export function ProfileSetupScreen({ name: initialName, avatar, onNext }: ProfileSetupProps) {
+  const [name, setName] = React.useState(initialName);
+  const [bio, setBio] = React.useState('');
+  return (
+    <View style={styles.root}>
+      <SparkleBand />
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel="Edit photo" style={styles.setupAvatar} activeOpacity={0.85}>
+        <View style={styles.setupAvatarClip}>{avatar}</View>
+        <View style={styles.cameraBadge}><CameraGlyph /></View>
+      </TouchableOpacity>
+      <Text style={styles.setupTitle} accessibilityRole="header">Your Profile</Text>
+      <Text style={styles.setupSubtitle}>Introduce yourself to others in your events.</Text>
+      <Text style={[styles.setupLabel, { top: 275.1 }]}>Name</Text>
+      <TextInput
+        style={[styles.setupField, { top: 306.4, height: 51.7, borderRadius: 25.85 }]}
+        value={name}
+        onChangeText={setName}
+        accessibilityLabel="Name"
+        autoComplete="name"
+        maxLength={60}
+      />
+      <Text style={[styles.setupLabel, { top: 382.1 }]}>Bio</Text>
+      <TextInput
+        style={[styles.setupField, styles.setupBio]}
+        value={bio}
+        onChangeText={setBio}
+        placeholder="Share a little about your background and interests."
+        placeholderTextColor={ONB.hint}
+        accessibilityLabel="Bio"
+        multiline
+        maxLength={280}
+      />
+      <PrimaryButton label="Save Profile" enabled={name.trim().length > 0} onPress={onNext} />
+    </View>
+  );
+}
+
 function BellGlyph({ size = 30, color = '#949497' }: { size?: number; color?: string }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
@@ -299,5 +371,33 @@ const styles = StyleSheet.create({
   notifyMeta: { position: 'absolute', left: 60.4, fontSize: 12.3, lineHeight: 16.4, color: colors.ink },
   notifyBody: { position: 'absolute', left: 60.4, width: 192.1, fontSize: 12.3, lineHeight: 16.4, color: colors.ink },
   notifyThumb: { position: 'absolute', left: 262.9, width: 48, height: 48, borderRadius: 6 },
+  sparkleBand: {
+    position: 'absolute', left: 0, right: 0, top: 0, height: 160, overflow: 'hidden',
+    ...(Platform.OS === 'web' ? ({ backgroundImage: 'linear-gradient(180deg, #F0F0F0 0px, #FFFFFF 130px)' } as object) : { backgroundColor: '#F7F7F7' }),
+  },
+  sparkle: { position: 'absolute', width: SPARKLE, height: SPARKLE },
+  sparkleFade: {
+    position: 'absolute', left: 0, right: 0, top: 132, height: 28,
+    ...(Platform.OS === 'web' ? ({ backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0), #FFFFFF)' } as object) : {}),
+  },
+  setupAvatar: { position: 'absolute', left: 16, top: 108.8, width: 80, height: 80 },
+  setupAvatarClip: {
+    width: 80, height: 80, borderRadius: 40, overflow: 'hidden',
+    shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 14, shadowOffset: { width: 0, height: 6 },
+  },
+  cameraBadge: {
+    position: 'absolute', left: 55, top: 54.9, width: 25.5, height: 25.5, borderRadius: 12.75, backgroundColor: '#FFFFFF',
+    alignItems: 'center', justifyContent: 'center',
+    shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 6, shadowOffset: { width: 0, height: 2 },
+  },
+  setupTitle: { position: 'absolute', left: 16, top: 204.9, fontSize: 22, lineHeight: 27.3, fontWeight: '600', color: colors.ink, letterSpacing: -0.35 },
+  setupSubtitle: { position: 'absolute', left: 16, right: 16, top: 236.2, fontSize: 15, lineHeight: 18.9, color: colors.inkSecondary },
+  setupLabel: { position: 'absolute', left: 16, fontSize: 17, lineHeight: 21.1, fontWeight: '500', color: ONB.label },
+  setupField: {
+    position: 'absolute', left: 16, width: 361, backgroundColor: ONB.field, paddingHorizontal: 16,
+    fontSize: 16.8, color: colors.ink,
+    ...({ outlineStyle: 'none' } as object),
+  },
+  setupBio: { top: 413.4, height: 75, borderRadius: 24, paddingTop: 14.2, paddingBottom: 14.2, lineHeight: 23.3, textAlignVertical: 'top' },
   notifyChevron: { position: 'absolute', left: 326.4, width: 18, height: 18, borderRadius: 9, backgroundColor: ONB.chevronDisc, alignItems: 'center', justifyContent: 'center' },
 });

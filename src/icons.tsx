@@ -254,6 +254,15 @@ export const CatAI = ({ size = 22, color = '#E9659C' }: any) => (
     <Circle cx="14" cy="14.9" r="0.75" fill={color} stroke="none" />
   </Svg>
 );
+export const CatMusic = ({ color = '#B0A71B' }: any) => (
+  <Svg width={24} height={24} viewBox="0 0 24 24" fill="none" style={{ marginLeft: -1, marginRight: -1 } as any}>
+    <Circle cx="8.1" cy="12.4" r="7.1" fill="#F5F4E2" stroke={color} strokeWidth={1.8} />
+    <Circle cx="8.1" cy="12.4" r="1.6" fill={color} />
+    <Path d="M19.6 15.6V5.2l3 1.4" stroke={color} strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" />
+    <Circle cx="18.1" cy="15.9" r="1.9" fill={color} />
+  </Svg>
+);
+
 export const CatRunning = ({ size = 22, color = '#7EA834' }: any) => (
   <Svg width={size} height={size} viewBox="2 2.5 20 20" fill="none" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
     <Path d="M4.8 15.6 A8 8 0 1 1 15.7 18.4" fill="none" />

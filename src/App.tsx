@@ -11,15 +11,27 @@ import {
   BackArrow, ShareIcon, PlusIcon, CalendarEmptyIcon,
   ImageAddIcon, LocationPinInput, DescriptionIcon, LockIcon,
   GoogleIcon, PasskeyIcon,
-  CatFamily, CatTech, CatFood, CatBooks, CatGames, CatAI, CatRunning,
+  CatFamily, CatTech, CatFood, CatBooks, CatGames, CatAI, CatRunning, CatMusic,
   GearMark, SparkleIcon,
 } from './icons';
 import { feedEvents, popularEvents, popularEventsNext, categories, detailEvent, detailEvents, accountProfile } from './data';
-import { EmailSignInScreen, LinkPhoneScreen, PasskeyPromptScreen, NotifyOptInScreen } from './screens/Onboarding';
-import { ProfileScreen } from './screens/Profile';
+const loadOnboarding = () => import('./screens/Onboarding');
+const loadProfile = () => import('./screens/Profile');
+const EmailSignInScreen = React.lazy(() => loadOnboarding().then((m) => ({ default: m.EmailSignInScreen })));
+const LinkPhoneScreen = React.lazy(() => loadOnboarding().then((m) => ({ default: m.LinkPhoneScreen })));
+const PasskeyPromptScreen = React.lazy(() => loadOnboarding().then((m) => ({ default: m.PasskeyPromptScreen })));
+const ProfileSetupScreen = React.lazy(() => loadOnboarding().then((m) => ({ default: m.ProfileSetupScreen })));
+const NotifyOptInScreen = React.lazy(() => loadOnboarding().then((m) => ({ default: m.NotifyOptInScreen })));
+const ProfileScreen = React.lazy(() => loadProfile().then((m) => ({ default: m.ProfileScreen })));
+const PREFETCH_DELAY_MS = 2500;
+function prefetchScreens(): void {
+  loadOnboarding().catch(() => undefined);
+  loadProfile().catch(() => undefined);
+}
 import { ChatIllustration } from './components/ChatIllustration';
 import { extractCoverBackground } from './palette';
 import { registerAppFont } from './webfont';
+import { VisibleTarget, occluder } from './visibleBox';
 
 if (Platform.OS === 'web' && typeof document !== 'undefined') {
   const fid = 'luma-font-face';
@@ -331,7 +343,7 @@ function HomeScreen({ onOpenDetail, onScroll, onProfile }: { onOpenDetail: (id: 
           return (
           <View key={ev.id}>
             {showDate && (
-              <View style={[styles.dateDivider, styles.dateSticky, stickyPlate(i === 0)]}>
+              <View style={[styles.dateDivider, styles.dateSticky, stickyPlate(i === 0)]} {...occluder}>
                 <Text style={[styles.dateBold, DATE_TRACK[ev.dateLabel] !== undefined && { letterSpacing: DATE_TRACK[ev.dateLabel] }]}>{ev.dateLabel}</Text>
                 <Text style={styles.dateSlash}> / </Text>
                 <Text style={[styles.dateDay, { letterSpacing: WEEKDAY_TRACK[ev.dayLabel] ?? 0 }]}>{ev.dayLabel}</Text>
@@ -384,6 +396,7 @@ function HomeScreen({ onOpenDetail, onScroll, onProfile }: { onOpenDetail: (id: 
                     ) : null}
                   </>
                 )}
+                <VisibleTarget accessibilityRole="button" aria-hidden style={styles.feedBodyTarget} />
               </View>
             </TouchableOpacity>
           </View>
@@ -476,15 +489,12 @@ function PopularCard({ ev, cover, onPress, isLast, isFirst }: { ev: any; cover: 
   const bodyPad = isFirst ? 21.4 : 8.7;
   return (
     <View style={styles.popCardWrap}>
-      <TouchableOpacity
-        activeOpacity={0.85}
-        onPress={onPress}
-        style={styles.popCard}
-      >
+      <View style={styles.popCard}>
         <Image source={cover} style={[styles.popCover as any, { marginTop: coverPad }]} resizeMode="cover" />
         {ev && (
           <View
             style={[styles.popCardBody, { marginTop: bodyPad }]}
+            pointerEvents="none"
             accessibilityRole="button"
             accessibilityLabel={[ev.title, ev.time, ev.badge?.label, `By ${ev.host}`].filter(Boolean).join(', ')}
           >
@@ -504,7 +514,8 @@ function PopularCard({ ev, cover, onPress, isLast, isFirst }: { ev: any; cover: 
             </View>
           </View>
         )}
-      </TouchableOpacity>
+        <VisibleTarget accessibilityRole="button" onPress={onPress} style={styles.popCardTarget} />
+      </View>
       {!isLast && <View style={styles.popHairline} />}
     </View>
   );
@@ -517,7 +528,7 @@ const DISCOVER_RULES = [590.6, 629.9, 639.0, 678.3];
 function DiscoverScreen({ onOpenDetail, onScroll, onProfile }: { onOpenDetail: (id: string) => void; onScroll?: (y: number) => void; onProfile: () => void }) {
   const catIcons: Record<string, any> = {
     family: <CatFamily />, tech: <CatTech />, food: <CatFood />,
-    books: <CatBooks />, games: <CatGames />, ai: <CatAI />, running: <CatRunning />,
+    books: <CatBooks />, games: <CatGames />, ai: <CatAI />, running: <CatRunning />, music: <CatMusic />,
   };
   const row1 = categories.slice(0, 4);
   const row2 = categories.slice(4, 8);
@@ -565,18 +576,20 @@ function DiscoverScreen({ onOpenDetail, onScroll, onProfile }: { onOpenDetail: (
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.catRow}
           contentContainerStyle={{ paddingHorizontal: 16, gap: 8 }}>
           {row1.map((cat) => (
-            <View key={cat.id} style={styles.catChip} accessibilityRole="button">
+            <View key={cat.id} style={styles.catChip}>
               {catIcons[cat.icon]}
               <Text style={[styles.catLabel, { letterSpacing: (cat as any).track }]}>{cat.label}</Text>
+              <VisibleTarget accessibilityRole="button" style={styles.catChipTarget} />
             </View>
           ))}
         </ScrollView>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.catRow2}
           contentContainerStyle={{ paddingHorizontal: 16, gap: 8 }}>
           {row2.map((cat) => (
-            <View key={cat.id} style={styles.catChip} accessibilityRole="button">
+            <View key={cat.id} style={styles.catChip}>
               {catIcons[cat.icon]}
               <Text style={[styles.catLabel, { letterSpacing: (cat as any).track }]}>{cat.label}</Text>
+              <VisibleTarget accessibilityRole="button" style={styles.catChipTarget} />
             </View>
           ))}
         </ScrollView>
@@ -637,13 +650,19 @@ function DetailScreen({ eventId, onBack }: { eventId: string | null; onBack: () 
           </View>
         </View>
         <View style={styles.detailBody}>
-          <Text style={styles.detailTitle}>{ev.title}</Text>
+          <Text style={[styles.detailTitle, pinned && styles.detailTitleGone]}>{ev.title}</Text>
           <View style={styles.detailHostRow}>
             <Image source={ev.hostMark} style={{ width: 16, height: 16, borderRadius: 4, resizeMode: 'cover' } as any} />
             <Text style={styles.detailHost}>{ev.host}</Text>
             <ChevronRight size={18} color={colors.detailMuted} />
           </View>
           <Text style={styles.detailTime}>{ev.time}</Text>
+          {ev.spotsLeft !== undefined && (
+            <View style={styles.detailSpotsRow}>
+              <HourglassIcon />
+              <Text style={styles.detailSpots}>{`${ev.spotsLeft} Spots Left`}</Text>
+            </View>
+          )}
 
           <View style={styles.detailActions}>
             <TouchableOpacity style={[styles.detailAction, styles.detailActionPrimary]} accessibilityLabel="Register" activeOpacity={0.8} onPress={() => setSheet('register')}>
@@ -659,11 +678,32 @@ function DetailScreen({ eventId, onBack }: { eventId: string | null; onBack: () 
               <Text style={[styles.detailActionLabel, { letterSpacing: ACTION_LABEL_TRACK.more }]}>More</Text>
             </TouchableOpacity>
           </View>
+          {ev.accessCode && (
+            <TouchableOpacity style={styles.detailAccessRow} accessibilityRole="button" activeOpacity={0.7} onPress={() => setSheet('register')}>
+              <LockOpenIcon />
+              <Text style={styles.detailAccessText}>Have an access code?</Text>
+            </TouchableOpacity>
+          )}
 
-          <Text style={[styles.detailSection, styles.detailSectionFirst]}>Location</Text>
+          <Text style={[styles.detailSection, ev.accessCode ? styles.detailSectionAfterAccess : styles.detailSectionFirst]}>Location</Text>
           <View style={styles.detailDivider} />
-          <Text style={styles.detailLocation}>{ev.location}</Text>
-          <Text style={styles.detailAddress}>{ev.address}</Text>
+          {ev.gated ? (
+            <>
+              <View style={styles.detailGatedRow}>
+                <Text style={[styles.detailLocation, { flex: 1 }]}>Register to See Location</Text>
+                <View accessibilityLabel={ev.gated.weather} accessibilityRole="image" style={styles.detailWeatherIcon}><CloudIcon /></View>
+              </View>
+              <View style={styles.detailGatedRow}>
+                <Text style={[styles.detailAddress, { flex: 1 }]}>{ev.gated.area}</Text>
+                <Text style={[styles.detailAddress, styles.detailTemp]}>{ev.gated.temp}</Text>
+              </View>
+            </>
+          ) : (
+            <>
+              <Text style={styles.detailLocation}>{ev.location}</Text>
+              <Text style={styles.detailAddress}>{ev.address}</Text>
+            </>
+          )}
           <View style={styles.detailMap} accessibilityRole="button" accessibilityLabel="Map">
             <View style={[styles.mapBlock, { left: '4%', top: '4%', width: '20%', height: '28%' }]} />
             <View style={[styles.mapBlock, { left: '32%', top: '4%', width: '22%', height: '28%' }]} />
@@ -684,7 +724,7 @@ function DetailScreen({ eventId, onBack }: { eventId: string | null; onBack: () 
               <View style={styles.mapPinHead} />
               <View style={styles.mapPinTip} />
             </View>
-            <Text style={styles.mapLabel} {...({ 'aria-hidden': true } as any)}>{ev.location}</Text>
+            <Text style={styles.mapLabel} {...({ 'aria-hidden': true } as any)}>{ev.gated ? ev.gated.area : ev.location}</Text>
           </View>
 
           <View style={styles.detailHostHead}>
@@ -709,17 +749,55 @@ function DetailScreen({ eventId, onBack }: { eventId: string | null; onBack: () 
 
           <Text style={[styles.detailSection, styles.detailSectionAbout]}>About Event</Text>
           <View style={styles.detailDivider} />
-          <View style={styles.detailAboutMedia} accessibilityRole="button">
-            <View style={styles.detailAboutImage} accessibilityRole="button" accessibilityLabel="Image">
-              <Image source={ev.cover} style={styles.detailAboutImageFill as any} resizeMode="cover" />
+          {ev.aboutImage !== false && (
+            <View style={styles.detailAboutMedia} accessibilityRole="button">
+              <View style={styles.detailAboutImage} accessibilityRole="button" accessibilityLabel="Image">
+                <Image source={ev.cover} style={styles.detailAboutImageFill as any} resizeMode="cover" />
+              </View>
             </View>
-          </View>
+          )}
           <Text style={styles.detailAbout}>{ev.about}</Text>
+          {ev.agenda && (
+            <>
+              <Text style={styles.detailAgendaHeading} accessibilityRole="header">Event Details</Text>
+              {ev.agenda.map((line) => (
+                <View key={line} style={styles.detailAgendaRow}>
+                  <Text style={styles.detailAgendaDot} {...({ 'aria-hidden': true } as object)}>•</Text>
+                  <Text style={styles.detailAgendaText}>{line}</Text>
+                </View>
+              ))}
+            </>
+          )}
         </View>
       </ScrollView>
       <HomeIndicator theme="dark" />
       {sheet && <DetailSheet kind={sheet} onClose={() => setSheet(null)} />}
     </View>
+  );
+}
+
+function HourglassIcon({ color = '#F6DC8C' }: { color?: string }) {
+  return (
+    <Svg width={16} height={16} viewBox="0 0 16 16" fill="none" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M3.6 1.4h8.8M3.6 14.6h8.8M4.6 1.4c0 3.4 3.4 4.6 3.4 6.6s-3.4 3.2-3.4 6.6M11.4 1.4c0 3.4-3.4 4.6-3.4 6.6s3.4 3.2 3.4 6.6" />
+    </Svg>
+  );
+}
+
+function LockOpenIcon({ color = 'rgba(255,255,255,0.6)' }: { color?: string }) {
+  return (
+    <Svg width={16} height={16} viewBox="0 0 16 16" fill="none" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M3.2 8.2h9.6a1.2 1.2 0 0 1 1.2 1.2v4.2a1.6 1.6 0 0 1-1.6 1.6H3.6A1.6 1.6 0 0 1 2 13.6V9.4a1.2 1.2 0 0 1 1.2-1.2z" />
+      <Path d="M4.6 8.2V5.3a3.3 3.3 0 0 1 6.4-1.2" />
+    </Svg>
+  );
+}
+
+function CloudIcon({ color = '#FFFFFF' }: { color?: string }) {
+  return (
+    <Svg width={21} height={21} viewBox="0 0 21 21" fill="none" stroke={color} strokeWidth={1.5} strokeLinejoin="round">
+      <Path d="M6 16.8h9.6a3.8 3.8 0 0 0 .5-7.6A5.2 5.2 0 0 0 6.3 8.1 4.4 4.4 0 0 0 6 16.8z" />
+    </Svg>
   );
 }
 
@@ -895,12 +973,13 @@ function CoverGallery({ onBack, onPick }: { onBack: () => void; onPick: (cover: 
         </View>
         <View style={styles.galleryGrid}>
           {tiles.map((t) => (
-            <TouchableOpacity key={t.label} style={styles.galleryTile} activeOpacity={0.85} accessibilityRole="button" onPress={() => onPick(t.cover)}>
+            <View key={t.label} style={styles.galleryTile}>
               <Image source={t.cover} style={styles.galleryTileImg as any} resizeMode="cover" />
               <View style={styles.galleryTileLabelWrap} {...({ 'aria-hidden': true } as any)}>
                 <Text style={styles.galleryTileLabel}>{t.label}</Text>
               </View>
-            </TouchableOpacity>
+              <VisibleTarget accessibilityRole="button" accessibilityLabel={`${t.label} cover`} onPress={() => onPick(t.cover)} />
+            </View>
           ))}
         </View>
         </>
@@ -936,7 +1015,7 @@ function CreateScreen({ onBack }: { onBack: () => void }) {
         <View style={styles.createAvatarGroup} accessibilityRole="button">
           <AccountAvatar size={28} style={{ pointerEvents: 'none' }} />
           <View style={styles.createAvatarTarget} accessibilityRole="button" accessibilityLabel={accountProfile.name} />
-          <ChevronDown size={18} color="#A8A8AC" />
+          <View style={styles.createAvatarChevron}><ChevronDown size={19.2} color="#BEBEBF" /></View>
         </View>
       </View>
       <ScrollView style={styles.scroll} contentContainerStyle={{ paddingBottom: 130 }} showsVerticalScrollIndicator={false}>
@@ -1086,7 +1165,7 @@ const pct = (v: number) => `${(v / TAB_FRAME_W) * 100}%` as `${number}%`;
 function TabBar({ active, onChange }: { active: string; onChange: (t: string) => void }) {
   return (
     <View style={styles.tabBar}>
-      <View style={styles.tabBarFill} />
+      <View style={styles.tabBarFill} {...occluder} />
       {tabs.map((t) => {
         const I = t.icon;
         const isActive = active === t.id;
@@ -1103,7 +1182,7 @@ function TabBar({ active, onChange }: { active: string; onChange: (t: string) =>
   );
 }
 
-type Screen = 'promo' | 'login' | 'email' | 'linkPhone' | 'passkey' | 'notifyOptIn' | 'main' | 'detail' | 'create' | 'profile';
+type Screen = 'promo' | 'login' | 'email' | 'linkPhone' | 'passkey' | 'profileSetup' | 'notifyOptIn' | 'main' | 'detail' | 'create' | 'profile';
 
 export default function App() {
   const [screen, setScreen] = React.useState<Screen>('promo');
@@ -1122,16 +1201,25 @@ export default function App() {
     lastY.current = y;
   };
 
+  React.useEffect(() => {
+    const t = setTimeout(prefetchScreens, PREFETCH_DELAY_MS);
+    return () => clearTimeout(t);
+  }, []);
+
   if (screen === 'promo' || screen === 'login') {
     return <PromoScreen key={screen} initialPanelOpen={screen === 'login'} onNext={() => setScreen('main')} onEmail={() => setScreen('email')} />;
   }
-  if (screen === 'email') return <EmailSignInScreen onBack={() => setScreen('login')} onNext={() => setScreen('linkPhone')} />;
-  if (screen === 'linkPhone') return <LinkPhoneScreen onNext={() => setScreen('passkey')} />;
-  if (screen === 'passkey') return <PasskeyPromptScreen onNext={() => setScreen('notifyOptIn')} />;
-  if (screen === 'notifyOptIn') return <NotifyOptInScreen onNext={() => setScreen('main')} />;
+  const deferred = (node: React.ReactNode) => <React.Suspense fallback={<View style={styles.screenRoot} />}>{node}</React.Suspense>;
+  if (screen === 'email') return deferred(<EmailSignInScreen onBack={() => setScreen('login')} onNext={() => setScreen('linkPhone')} />);
+  if (screen === 'linkPhone') return deferred(<LinkPhoneScreen onNext={() => setScreen('passkey')} />);
+  if (screen === 'passkey') return deferred(<PasskeyPromptScreen onNext={() => setScreen('profileSetup')} />);
+  if (screen === 'profileSetup') {
+    return deferred(<ProfileSetupScreen name={accountProfile.name} avatar={<AccountAvatar size={80} />} onNext={() => setScreen('notifyOptIn')} />);
+  }
+  if (screen === 'notifyOptIn') return deferred(<NotifyOptInScreen onNext={() => setScreen('main')} />);
   if (screen === 'detail') return <DetailScreen eventId={detailId} onBack={() => setScreen('main')} />;
   if (screen === 'create') return <CreateScreen onBack={() => setScreen('main')} />;
-  if (screen === 'profile') return <ProfileScreen onBack={() => setScreen('main')} avatar={<AccountAvatar size={80} />} />;
+  if (screen === 'profile') return deferred(<ProfileScreen onBack={() => setScreen('main')} avatar={<AccountAvatar size={80} />} />);
   const openProfile = () => setScreen('profile');
 
   return (
@@ -1193,7 +1281,7 @@ const styles = StyleSheet.create({
   terms: { position: 'absolute', top: 269.1, left: 0, right: 0, fontSize: 11.8, color: colors.inkMuted, textAlign: 'center', fontWeight: '400' },
   termsLink: { position: 'absolute' as const, right: 63.7, top: 0, color: '#151516' },
 
-  homeHeader: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingTop: 4, paddingBottom: 0, gap: 8 },
+  homeHeader: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingTop: 4, paddingBottom: 0, gap: 8, backgroundColor: colors.white },
   avatarBtn: { width: 48, height: 48, marginLeft: -4, alignItems: 'center', justifyContent: 'center' },
   avatar: {
     width: 40, height: 40, borderRadius: 20,
@@ -1224,6 +1312,7 @@ const styles = StyleSheet.create({
   feedRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, marginTop: 10.3, paddingBottom: 16 },
   feedCover: { width: 80, height: 80, borderRadius: 12, backgroundColor: '#E8E8EC', alignSelf: 'flex-start' },
   feedBody: { flex: 1, marginLeft: 12.1, justifyContent: 'flex-start' },
+  feedBodyTarget: { zIndex: 1 },
   hostRow: { flexDirection: 'row', alignItems: 'center', minHeight: 16, marginTop: 3, marginBottom: 2.9 },
   hostRowPriced: { minHeight: 18.2, marginTop: 0, marginBottom: 8.4 },
   hostName: { fontSize: 12, color: colors.inkSecondary, fontWeight: '400' },
@@ -1242,6 +1331,7 @@ const styles = StyleSheet.create({
   popularColumn: { width: 343.5 },
   popCardWrap: { width: 343.5, height: 132.8 },
   popCard: { height: 116.1, width: 343.5, flexDirection: 'row', paddingLeft: 16 },
+  popCardTarget: { zIndex: 1 },
   popHairline: { position: 'absolute', left: 92, right: 4, top: 124, height: 1, backgroundColor: '#F0F0F1' },
   popCover: { width: 80, height: 80, borderRadius: 12, marginLeft: 0, marginTop: 9, backgroundColor: '#E8E8EC' },
   popCardBody: { marginLeft: 12.1, marginTop: 9, width: 231.4, alignSelf: 'flex-start' },
@@ -1257,6 +1347,7 @@ const styles = StyleSheet.create({
   catRow: { marginTop: 13 },
   catRow2: { marginTop: 0.4 },
   catChip: { flexDirection: 'row', alignItems: 'center', paddingLeft: 11.2, paddingRight: 12.1, height: 48, borderWidth: 1, borderColor: '#F0F0F1', borderRadius: 15, gap: 8, backgroundColor: colors.white },
+  catChipTarget: { zIndex: 1 },
   catLabel: { fontSize: 15, fontWeight: '500', color: colors.ink },
   citiesRow: { flexDirection: 'row', alignItems: 'flex-start', paddingHorizontal: 16, marginTop: 17.65 },
   discCities: { fontSize: 19, fontWeight: '700', color: colors.ink, lineHeight: 25, width: 53.1 },
@@ -1286,6 +1377,7 @@ const styles = StyleSheet.create({
   detailCover: { width: '100%', height: 393, backgroundColor: '#1a1a2e' },
   detailBody: { paddingHorizontal: 16, marginTop: 14.95 },
   detailTitle: { fontSize: 27, fontWeight: '600', color: colors.detailText, lineHeight: 32 },
+  detailTitleGone: { visibility: 'hidden' } as object,
   detailHostRow: { flexDirection: 'row', alignItems: 'center', minHeight: 16, marginTop: 13.3 },
   detailHost: { fontSize: 16, color: colors.detailMuted, marginLeft: 6.2 },
   detailTime: { fontSize: 16, color: colors.detailMuted, marginTop: 11 },
@@ -1299,6 +1391,18 @@ const styles = StyleSheet.create({
   detailActionLabelPrimary: { color: '#000000' },
   detailSection: { fontSize: 16, fontWeight: '500', color: colors.detailMuted, marginTop: 0, lineHeight: 18.9 },
   detailSectionFirst: { marginTop: 24.15 },
+  detailSectionAfterAccess: { marginTop: 9.5 },
+  detailSpotsRow: { flexDirection: 'row', alignItems: 'center', height: 18.9, marginTop: 8.1 },
+  detailSpots: { marginLeft: 5.1, fontSize: 15, fontWeight: '500', color: '#F6DC8C', lineHeight: 18.9 },
+  detailAccessRow: { flexDirection: 'row', alignItems: 'center', height: 48, marginTop: 3.3 },
+  detailAccessText: { marginLeft: 8, fontSize: 15, color: colors.detailMuted, lineHeight: 18.9 },
+  detailGatedRow: { flexDirection: 'row', alignItems: 'center' },
+  detailWeatherIcon: { width: 21, height: 21, marginTop: 4.8, alignItems: 'center', justifyContent: 'center' },
+  detailTemp: { textAlign: 'right' },
+  detailAgendaHeading: { fontSize: 16, fontWeight: '600', color: colors.detailText, lineHeight: 22.2, marginTop: 12.8 },
+  detailAgendaRow: { flexDirection: 'row', marginTop: 3.3 },
+  detailAgendaDot: { width: 20.8, paddingLeft: 6.9, fontSize: 15, color: colors.detailText, lineHeight: 24.7 },
+  detailAgendaText: { flex: 1, fontSize: 15, color: colors.detailText, lineHeight: 24.7 },
   detailSectionInline: { fontSize: 16, fontWeight: '500', color: colors.detailMuted, lineHeight: 18.9, flex: 1, marginRight: 8 },
   detailSectionGoing: { marginTop: 24.4 },
   detailSectionAbout: { marginTop: 22.7 },
@@ -1370,6 +1474,7 @@ const styles = StyleSheet.create({
   createHeader: { flexDirection: 'row', alignItems: 'center', paddingLeft: 8, paddingRight: 16, paddingTop: 4, paddingBottom: 4, height: 56, gap: 8 },
   createTitle: { fontSize: 19, fontWeight: '500', color: colors.ink, width: 116.1, letterSpacing: -0.13 },
   createAvatarGroup: { width: 54.2, height: 48, flexDirection: 'row', alignItems: 'center' },
+  createAvatarChevron: { marginLeft: 4.6 },
   createAvatarTarget: { position: 'absolute' as const, left: 0, top: 9.8, width: 28, height: 28 },
   restorePill: { alignSelf: 'center', flexDirection: 'row', alignItems: 'flex-start', width: 168.8, height: 41.5, paddingLeft: 12 },
   restorePillFill: { position: 'absolute', left: 0, right: 0, top: 0, height: 35, borderRadius: 17.5, backgroundColor: '#EDEEEF' },
