@@ -26,7 +26,7 @@ IMAGES
 Event covers, host marks, template cards and the welcome collage are
 original illustrations made for this prototype. They are not screenshots,
 recolourings or derivatives of any Luma, host or third-party image, and
-they are distributed under the prototype's noncommercial study licence.
+they are distributed under the prototype's MIT License.
 
 No Luma brand graphics, logos or avatar illustrations are used.
 
